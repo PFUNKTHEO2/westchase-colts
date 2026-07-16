@@ -8,6 +8,7 @@ import { CartProvider } from "@/lib/cart";
 import Index from "./pages/Index";
 import Roster from "./pages/Roster";
 import CardPreview from "./pages/CardPreview";
+import CreateCard from "./pages/CreateCard";
 import SponsorPage from "./pages/SponsorPage";
 import NotFound from "./pages/NotFound";
 
@@ -24,6 +25,7 @@ const App = () => (
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/roster" element={<Roster />} />
+              <Route path="/create-card" element={<CreateCard />} />
               <Route path="/card-preview/:cardId" element={<CardPreview />} />
               <Route path="/sponsor/:sponsorSlug" element={<SponsorPage />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

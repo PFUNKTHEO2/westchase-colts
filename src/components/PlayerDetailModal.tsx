@@ -151,11 +151,11 @@ export function PlayerDetailModal({ player, team, onClose }: PlayerDetailModalPr
 
             <div className="space-y-2 text-xs text-muted-foreground">
               <p><span className="font-semibold text-foreground">Digital ProdigyCard</span> can be uploaded directly to your Apple Wallet, shared on social media, kept in your Gallery.</p>
-              <p><span className="font-semibold text-foreground">Metal ProdigyCard</span> in size of 2×3 inches will be delivered in 2nd half of April to Pflugerville FC to pick up.</p>
+              <p><span className="font-semibold text-foreground">Metal ProdigyCard</span> in standard 2.5×3.5 trading card size, available for pickup at the Colts field house at Ed Radice.</p>
             </div>
 
             <p className="text-xs text-center text-muted-foreground">
-              Proceeds support {team.ageGroup} {team.gender} and PAYSL programs
+              Proceeds support {team.ageGroup} {team.gender} and Colts programs
             </p>
           </div>
         </motion.div>

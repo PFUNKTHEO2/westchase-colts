@@ -28,7 +28,7 @@ export function SponsorsSection() {
             Our <span className="text-gradient">Sponsors</span>
           </h2>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            Thank you to these amazing partners for supporting PAYSL athletes!
+            Thank you to these amazing partners for supporting Colts athletes!
           </p>
         </motion.div>
 

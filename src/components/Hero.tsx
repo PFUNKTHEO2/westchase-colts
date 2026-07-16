@@ -52,7 +52,7 @@ export function Hero() {
           <h1 className="section-heading text-4xl md:text-6xl lg:text-7xl mb-4">
             Support Your
             <br />
-            <span className="text-gradient">PAYSL Athletes</span>
+            <span className="text-gradient">Westchase Colts</span>
           </h1>
 
           {/* Tagline */}
@@ -62,15 +62,17 @@ export function Hero() {
 
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
-            <Link to="/roster">
+            <Link to="/create-card">
               <Button size="lg" className="btn-primary-glow gap-2 text-lg px-8 py-6 bg-primary hover:bg-primary/90">
-                Browse Player Cards
+                Create Your Colt's Card
                 <ArrowRight className="w-5 h-5" />
               </Button>
             </Link>
-            <Button size="lg" variant="outline" className="gap-2 text-lg px-8 py-6 border-accent/50 text-accent hover:bg-accent/10">
-              Become a Sponsor
-            </Button>
+            <Link to="/roster">
+              <Button size="lg" variant="outline" className="gap-2 text-lg px-8 py-6 border-accent/50 text-accent hover:bg-accent/10">
+                Browse Player Cards
+              </Button>
+            </Link>
           </div>
 
           {/* Stats */}

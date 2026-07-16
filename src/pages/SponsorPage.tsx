@@ -57,7 +57,7 @@ export default function SponsorPage() {
 
                 <div className="flex items-center justify-center gap-6 md:gap-12 mb-8">
                   <div className="bg-white rounded-lg p-4 md:p-6 shadow-xl">
-                    <h3 className="text-xl md:text-2xl font-bold text-gray-900">Sing Orthodontics</h3>
+                    <h3 className="text-xl md:text-2xl font-bold text-gray-900">Tech Sherpas</h3>
                     <p className="text-xs md:text-sm text-gray-600 mt-1">SingSmile™ Your Smile. Our Passion.</p>
                   </div>
                   <span className="text-3xl text-muted-foreground font-light">×</span>
@@ -197,7 +197,7 @@ export default function SponsorPage() {
                         {
                           icon: Users,
                           title: "Massive Reach",
-                          desc: "Title sponsor branding across 12,000+ athlete families in the Pflugerville area",
+                          desc: "Title sponsor branding across 200+ Colts families in the Westchase and Tampa Bay area",
                         },
                         {
                           icon: TrendingUp,
@@ -254,7 +254,7 @@ export default function SponsorPage() {
                   {
                     icon: Trophy,
                     title: "Build the Future",
-                    desc: `${titleSponsor.developmentShare}% funds PAYSL development, equipment, and facilities`,
+                    desc: `${titleSponsor.developmentShare}% funds Colts development, equipment, and facilities`,
                     color: "primary",
                   },
                 ].map((item, index) => (
@@ -295,7 +295,7 @@ export default function SponsorPage() {
                 viewport={{ once: true }}
               >
                 <h2 className="text-2xl font-bold text-foreground mb-4">
-                  Ready to Support PAYSL Athletes?
+                  Ready to Support the Colts?
                 </h2>
                 <p className="text-muted-foreground mb-8">
                   Browse our collection and get your favorite player cards today.

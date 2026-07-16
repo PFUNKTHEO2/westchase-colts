@@ -1,0 +1,364 @@
+/**
+ * /create-card — the family self-serve flow (the "Wentworth Studio" pattern,
+ * club edition): register, upload a photo, write the story, watch the card
+ * build itself live, then order. The back of a Colts card carries the family's
+ * BLURB, not stats — every kid gets a story, not a stat line.
+ */
+import { useMemo, useRef, useState } from "react";
+import { Helmet } from "react-helmet-async";
+import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
+import { Camera, Check, PenLine, ShoppingCart, Sparkles, UserRound } from "lucide-react";
+import { Navbar } from "@/components/Navbar";
+import { Footer } from "@/components/Footer";
+import { PFCLogo } from "@/components/PFCLogo";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { useToast } from "@/hooks/use-toast";
+import { teams, type Team, type TeamPlayer } from "@/lib/teams";
+import { teamConfig } from "@/lib/data";
+import { CARD_PRICES, useCart, type CardVariant } from "@/lib/cart";
+import { saveRegistration } from "@/lib/registrations";
+
+const BLURB_MAX = 280;
+const BLURB_PROMPTS = [
+  "What do teammates love about them?",
+  "A moment from this season the family will never forget.",
+  "What does being a Colt mean to them?",
+];
+
+const FOOTBALL_POSITIONS = [
+  "Quarterback", "Running Back", "Wide Receiver", "Tight End", "Offensive Line",
+  "Defensive Line", "Linebacker", "Cornerback", "Safety", "Kicker", "Athlete",
+];
+const CHEER_POSITIONS = ["Flyer", "Base", "Backspot", "Tumbler", "Dancer"];
+
+export default function CreateCard() {
+  const { toast } = useToast();
+  const { addItem } = useCart();
+
+  // player
+  const [playerName, setPlayerName] = useState("");
+  const [jerseyNumber, setJerseyNumber] = useState("");
+  const [teamId, setTeamId] = useState(teams[0].id);
+  const [position, setPosition] = useState("");
+
+  // photo
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [photo, setPhoto] = useState("");
+  const [photoWarning, setPhotoWarning] = useState("");
+
+  // story
+  const [blurb, setBlurb] = useState("");
+
+  // parent
+  const [parentName, setParentName] = useState("");
+  const [parentEmail, setParentEmail] = useState("");
+
+  // order
+  const [variant, setVariant] = useState<CardVariant>("metal");
+  const [side, setSide] = useState<"front" | "back">("front");
+  const [done, setDone] = useState(false);
+
+  const team = useMemo(() => teams.find((t) => t.id === teamId) ?? teams[0], [teamId]);
+  const positions = team.gender === "Cheer" ? CHEER_POSITIONS : FOOTBALL_POSITIONS;
+
+  const onPickFile = (file: File | undefined) => {
+    if (!file) return;
+    setPhotoWarning("");
+    const reader = new FileReader();
+    reader.onload = () => {
+      const url = String(reader.result);
+      const img = new Image();
+      img.onload = () => {
+        if (img.height < 700 || img.width < 500) {
+          setPhotoWarning("This photo is on the small side; it may look soft when printed. A larger original prints sharper.");
+        }
+        setPhoto(url);
+      };
+      img.src = url;
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const emailOk = /.+@.+\..+/.test(parentEmail);
+  const ready = playerName.trim() && photo && blurb.trim().length >= 20 && parentName.trim() && emailOk && position;
+
+  const order = () => {
+    if (!ready) return;
+    const reg = saveRegistration({
+      parentName: parentName.trim(),
+      parentEmail: parentEmail.trim(),
+      playerName: playerName.trim(),
+      jerseyNumber: jerseyNumber.trim() || "00",
+      division: team.ageGroup,
+      program: team.gender,
+      position,
+      blurb: blurb.trim(),
+      photo,
+    });
+    const player: TeamPlayer = {
+      id: reg.id,
+      name: reg.playerName,
+      number: reg.jerseyNumber,
+      position: reg.position,
+      born: "",
+      photo: reg.photo,
+      blurb: reg.blurb,
+    };
+    addItem(player, team as Team, variant);
+    setDone(true);
+    toast({ title: "Card added to cart", description: `${reg.playerName} — ${team.ageGroup} ${team.gender}` });
+  };
+
+  const reset = () => {
+    setPlayerName(""); setJerseyNumber(""); setPosition(""); setPhoto("");
+    setBlurb(""); setDone(false); setSide("front");
+  };
+
+  return (
+    <div className="min-h-screen">
+      <Helmet>
+        <title>Create Your Card | {teamConfig.name}</title>
+        <meta name="description" content="Upload a photo, write their story, and turn your Colt into a collectible trading card. Every sale supports the Westchase Colts." />
+      </Helmet>
+      <Navbar />
+
+      <main className="container mx-auto px-4 pb-24 pt-28">
+        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="mx-auto max-w-2xl text-center">
+          <p className="text-xs font-medium uppercase tracking-[0.2em] text-accent">Colts Families</p>
+          <h1 className="section-heading mt-2">Turn Your Colt Into a Trading Card</h1>
+          <p className="mt-3 text-muted-foreground">
+            Upload your favorite photo, write their story for the back of the card, and we handle
+            the rest. Every card sold puts money directly into the Colts program.
+          </p>
+        </motion.div>
+
+        <div className="mt-12 grid gap-10 lg:grid-cols-[minmax(0,420px)_minmax(0,1fr)] lg:items-start">
+          {/* ── LIVE PREVIEW ── */}
+          <div className="mx-auto w-full max-w-[380px] lg:sticky lg:top-28">
+            <div className="mb-3 flex justify-center">
+              <div className="inline-flex rounded-lg border border-border bg-card/60 p-1">
+                {(["front", "back"] as const).map((s) => (
+                  <button
+                    key={s}
+                    onClick={() => setSide(s)}
+                    className={`rounded-md px-4 py-1.5 text-sm font-semibold capitalize transition ${
+                      side === s ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    {s}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="perspective-1000">
+              <div className="relative aspect-[2.5/3.5] overflow-hidden rounded-xl card-glow">
+                {side === "front" ? (
+                  <>
+                    {photo ? (
+                      <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url('${photo}')` }} />
+                    ) : (
+                      <div className="absolute inset-0 flex items-center justify-center bg-secondary">
+                        <div className="px-8 text-center text-sm text-muted-foreground">
+                          <Camera className="mx-auto mb-2 h-8 w-8" />
+                          Your photo goes here
+                        </div>
+                      </div>
+                    )}
+                    <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
+                    <div className="absolute left-3 top-3"><PFCLogo size="sm" /></div>
+                    <div className="absolute bottom-0 left-0 right-0 p-4">
+                      <p className="text-xs font-medium uppercase tracking-wider text-accent">
+                        {position || "Position"} · {team.ageGroup} {team.gender}
+                      </p>
+                      <div className="flex items-end justify-between">
+                        <h3 className="font-display text-2xl font-bold">{playerName || "Player Name"}</h3>
+                        <div className="flex h-12 w-12 items-center justify-center rounded-lg border border-primary/30 bg-primary/20">
+                          <span className="font-display text-xl font-bold text-primary">#{jerseyNumber || "00"}</span>
+                        </div>
+                      </div>
+                      <p className="mt-1 text-xs text-muted-foreground">{teamConfig.name} · {teamConfig.season}</p>
+                    </div>
+                  </>
+                ) : (
+                  <div className="absolute inset-0 flex flex-col bg-gradient-to-b from-secondary to-background p-5">
+                    <div className="flex items-center justify-between">
+                      <PFCLogo size="sm" />
+                      <div className="text-right">
+                        <p className="font-display text-lg font-bold leading-tight">{playerName || "Player Name"}</p>
+                        <p className="text-xs text-muted-foreground">#{jerseyNumber || "00"} · {team.ageGroup} {team.gender}</p>
+                      </div>
+                    </div>
+                    <div className="mt-4 h-px bg-gradient-to-r from-transparent via-primary/60 to-transparent" />
+                    <div className="flex flex-1 items-center">
+                      <p className={`text-sm leading-relaxed ${blurb ? "text-foreground/90" : "italic text-muted-foreground"}`}>
+                        {blurb || "Their story goes here. Written by the family, printed on the card, kept forever."}
+                      </p>
+                    </div>
+                    <div className="h-px bg-gradient-to-r from-transparent via-primary/60 to-transparent" />
+                    <div className="mt-3 flex items-center justify-between text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+                      <span>{teamConfig.name}</span>
+                      <span>{teamConfig.season}</span>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+            <p className="mt-3 text-center text-xs text-muted-foreground">
+              Live preview. The printed card carries the same design.
+            </p>
+          </div>
+
+          {/* ── FORM ── */}
+          <div className="space-y-8">
+            {/* 1 · player */}
+            <section>
+              <h2 className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+                <UserRound className="h-4 w-4 text-accent" /> 1 · Your Colt
+              </h2>
+              <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                <Input value={playerName} onChange={(e) => setPlayerName(e.target.value)} placeholder="Player name" maxLength={40} />
+                <Input value={jerseyNumber} onChange={(e) => setJerseyNumber(e.target.value.replace(/\D/g, "").slice(0, 2))} placeholder="Jersey #" inputMode="numeric" />
+                <select
+                  value={teamId}
+                  onChange={(e) => { setTeamId(e.target.value); setPosition(""); }}
+                  className="h-10 rounded-md border border-input bg-background px-3 text-sm"
+                >
+                  {teams.map((t) => (
+                    <option key={t.id} value={t.id}>{t.ageGroup} {t.gender}</option>
+                  ))}
+                </select>
+                <select
+                  value={position}
+                  onChange={(e) => setPosition(e.target.value)}
+                  className="h-10 rounded-md border border-input bg-background px-3 text-sm"
+                >
+                  <option value="" disabled>Position</option>
+                  {positions.map((p) => (
+                    <option key={p} value={p}>{p}</option>
+                  ))}
+                </select>
+              </div>
+            </section>
+
+            {/* 2 · photo */}
+            <section>
+              <h2 className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+                <Camera className="h-4 w-4 text-accent" /> 2 · The Photo
+              </h2>
+              <input ref={fileRef} type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={(e) => onPickFile(e.target.files?.[0])} />
+              <div className="mt-3 flex items-center gap-3">
+                <Button variant="outline" onClick={() => fileRef.current?.click()}>
+                  <Camera className="mr-1 h-4 w-4" /> {photo ? "Replace photo" : "Upload photo"}
+                </Button>
+                {photo && (
+                  <span className="inline-flex items-center gap-1 text-xs font-medium text-emerald-400">
+                    <Check className="h-3.5 w-3.5" /> looking good
+                  </span>
+                )}
+              </div>
+              <p className="mt-1 text-xs text-muted-foreground">
+                Game action, team photo day, or your favorite sideline shot. JPEG or PNG.
+              </p>
+              {photoWarning && <p className="mt-1 text-xs text-amber-400">{photoWarning}</p>}
+            </section>
+
+            {/* 3 · story */}
+            <section>
+              <h2 className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+                <PenLine className="h-4 w-4 text-accent" /> 3 · Their Story
+              </h2>
+              <p className="mt-1 text-xs text-muted-foreground">
+                This prints on the back of the card. No stats needed, just what makes them who they are.
+              </p>
+              <Textarea
+                value={blurb}
+                onChange={(e) => setBlurb(e.target.value.slice(0, BLURB_MAX))}
+                placeholder={BLURB_PROMPTS[0]}
+                className="mt-3 min-h-28"
+              />
+              <div className="mt-1 flex items-center justify-between text-xs text-muted-foreground">
+                <div className="flex flex-wrap gap-2">
+                  {BLURB_PROMPTS.map((p) => (
+                    <button key={p} onClick={() => setBlurb((b) => (b ? b : p))} className="rounded-full border border-border px-2 py-0.5 hover:text-foreground">
+                      {p}
+                    </button>
+                  ))}
+                </div>
+                <span className={blurb.length > BLURB_MAX - 30 ? "text-amber-400" : ""}>{blurb.length}/{BLURB_MAX}</span>
+              </div>
+            </section>
+
+            {/* 4 · parent */}
+            <section>
+              <h2 className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+                <Sparkles className="h-4 w-4 text-accent" /> 4 · Parent or Guardian
+              </h2>
+              <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                <Input value={parentName} onChange={(e) => setParentName(e.target.value)} placeholder="Your name" maxLength={60} />
+                <Input value={parentEmail} onChange={(e) => setParentEmail(e.target.value)} placeholder="Email" type="email" />
+              </div>
+              <p className="mt-1 text-xs text-muted-foreground">
+                We only use this to send your order confirmation and card proof.
+              </p>
+            </section>
+
+            {/* 5 · order */}
+            <section className="rounded-xl border border-border bg-card/60 p-5">
+              <h2 className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+                <ShoppingCart className="h-4 w-4 text-accent" /> 5 · Order
+              </h2>
+              <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                {(["metal", "digital"] as CardVariant[]).map((v) => (
+                  <button
+                    key={v}
+                    onClick={() => setVariant(v)}
+                    className={`rounded-lg border p-4 text-left transition ${
+                      variant === v ? "border-primary bg-primary/10" : "border-border hover:border-muted-foreground"
+                    }`}
+                  >
+                    <p className="font-semibold">{v === "metal" ? "Metal Card" : "Digital Card"}</p>
+                    <p className="text-2xl font-bold text-primary">${CARD_PRICES[v]}</p>
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      {v === "metal"
+                        ? "Printed on metal, pickup at the club. $20 goes to the Colts."
+                        : "Shareable digital collectible. $13.50 goes to the Colts."}
+                    </p>
+                  </button>
+                ))}
+              </div>
+              {done ? (
+                <div className="mt-4 space-y-2">
+                  <p className="inline-flex items-center gap-1 text-sm font-medium text-emerald-400">
+                    <Check className="h-4 w-4" /> In your cart. Open the cart up top to check out.
+                  </p>
+                  <Button variant="outline" className="w-full" onClick={reset}>Create another card</Button>
+                </div>
+              ) : (
+                <Button className="mt-4 w-full" size="lg" disabled={!ready} onClick={order}>
+                  Add to cart — ${CARD_PRICES[variant]}
+                </Button>
+              )}
+              {!ready && !done && (
+                <p className="mt-2 text-xs text-muted-foreground">
+                  Needs: player name, position, a photo, a story (at least 20 characters), and your contact info.
+                </p>
+              )}
+            </section>
+
+            <p className="text-xs leading-relaxed text-muted-foreground">
+              The Westchase Colts are a 501(c)(3) non-profit. Card proceeds fund equipment, field
+              time, cheer competitions, and scholarships so every kid can play.{" "}
+              <Link to="/roster" className="text-accent underline">See all teams</Link>
+            </p>
+          </div>
+        </div>
+      </main>
+
+      <Footer />
+    </div>
+  );
+}

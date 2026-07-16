@@ -1,12 +1,15 @@
-interface PFCLogoProps {
+interface LogoProps {
   className?: string;
   size?: "sm" | "md" | "lg";
 }
 
-export function PFCLogo({ className = "", size = "md" }: PFCLogoProps) {
+/**
+ * Westchase Colts crest — shield + horseshoe. Export names kept from the
+ * PAYSL template (PFCLogo = club crest, PAYSLLogo = league/secondary mark)
+ * so existing imports keep working.
+ */
+export function PFCLogo({ className = "", size = "md" }: LogoProps) {
   const dims = size === "sm" ? "h-10 w-10" : size === "md" ? "h-14 w-14" : "h-20 w-20";
-  const textSize = size === "sm" ? "text-[5px]" : size === "md" ? "text-[7px]" : "text-[10px]";
-  const mainText = size === "sm" ? "text-[8px]" : size === "md" ? "text-[11px]" : "text-[16px]";
 
   return (
     <div className={`${dims} ${className} flex-shrink-0`}>
@@ -27,36 +30,50 @@ export function PFCLogo({ className = "", size = "md" }: PFCLogoProps) {
           strokeWidth="1"
           strokeOpacity="0.5"
         />
-        {/* Soccer ball icon */}
-        <circle cx="40" cy="32" r="8" fill="none" stroke="hsl(var(--primary))" strokeWidth="1.5" />
+        {/* Horseshoe */}
         <path
-          d="M40 24L42 28H38L40 24Z M40 40L38 36H42L40 40Z M32 32L36 30V34L32 32Z M48 32L44 34V30L48 32Z"
-          fill="hsl(var(--primary))"
-          fillOpacity="0.8"
+          d="M30 38C30 30 34 24 40 24C46 24 50 30 50 38"
+          fill="none"
+          stroke="hsl(var(--primary))"
+          strokeWidth="4"
+          strokeLinecap="round"
         />
-        {/* PFLUGERVILLE text */}
-        <text x="40" y="52" textAnchor="middle" fill="hsl(var(--primary))" fontFamily="'Bebas Neue', sans-serif" fontSize="7" fontWeight="bold" letterSpacing="1.5">
-          PFLUGERVILLE
+        <path
+          d="M30 38L29 42M50 38L51 42"
+          stroke="hsl(var(--primary))"
+          strokeWidth="4"
+          strokeLinecap="round"
+        />
+        {/* Horseshoe nail holes */}
+        <circle cx="32" cy="31" r="1.1" fill="hsl(var(--accent))" />
+        <circle cx="36" cy="27.5" r="1.1" fill="hsl(var(--accent))" />
+        <circle cx="40" cy="26.5" r="1.1" fill="hsl(var(--accent))" />
+        <circle cx="44" cy="27.5" r="1.1" fill="hsl(var(--accent))" />
+        <circle cx="48" cy="31" r="1.1" fill="hsl(var(--accent))" />
+        {/* WESTCHASE text */}
+        <text x="40" y="54" textAnchor="middle" fill="hsl(var(--primary))" fontFamily="'Bebas Neue', sans-serif" fontSize="8" fontWeight="bold" letterSpacing="1.5">
+          WESTCHASE
         </text>
-        {/* FC text */}
-        <text x="40" y="62" textAnchor="middle" fill="hsl(var(--accent))" fontFamily="'Bebas Neue', sans-serif" fontSize="12" fontWeight="bold" letterSpacing="2">
-          FC
+        {/* COLTS text */}
+        <text x="40" y="65" textAnchor="middle" fill="hsl(var(--accent))" fontFamily="'Bebas Neue', sans-serif" fontSize="12" fontWeight="bold" letterSpacing="2.5">
+          COLTS
         </text>
         {/* Year */}
-        <text x="22" y="72" textAnchor="middle" fill="hsl(var(--muted-foreground))" fontFamily="'Bebas Neue', sans-serif" fontSize="6">
-          19
+        <text x="22" y="74" textAnchor="middle" fill="hsl(var(--muted-foreground))" fontFamily="'Bebas Neue', sans-serif" fontSize="6">
+          20
         </text>
-        <text x="58" y="72" textAnchor="middle" fill="hsl(var(--muted-foreground))" fontFamily="'Bebas Neue', sans-serif" fontSize="6">
-          82
+        <text x="58" y="74" textAnchor="middle" fill="hsl(var(--muted-foreground))" fontFamily="'Bebas Neue', sans-serif" fontSize="6">
+          01
         </text>
         {/* Divider line */}
-        <line x1="28" y1="70" x2="52" y2="70" stroke="hsl(var(--primary))" strokeWidth="0.5" strokeOpacity="0.5" />
+        <line x1="28" y1="72" x2="52" y2="72" stroke="hsl(var(--primary))" strokeWidth="0.5" strokeOpacity="0.5" />
       </svg>
     </div>
   );
 }
 
-export function PAYSLLogo({ className = "", size = "md" }: PFCLogoProps) {
+/** Secondary mark — Pop Warner affiliation badge. */
+export function PAYSLLogo({ className = "", size = "md" }: LogoProps) {
   const dims = size === "sm" ? "h-10 w-10" : size === "md" ? "h-14 w-14" : "h-20 w-20";
 
   return (
@@ -78,25 +95,17 @@ export function PAYSLLogo({ className = "", size = "md" }: PFCLogoProps) {
           strokeWidth="1"
           strokeOpacity="0.4"
         />
-        {/* Soccer ball */}
-        <circle cx="40" cy="32" r="8" fill="none" stroke="hsl(var(--accent))" strokeWidth="1.5" />
-        <path
-          d="M40 24L42 28H38L40 24Z M40 40L38 36H42L40 40Z M32 32L36 30V34L32 32Z M48 32L44 34V30L48 32Z"
-          fill="hsl(var(--accent))"
-          fillOpacity="0.8"
-        />
-        {/* PAYSL text */}
-        <text x="40" y="54" textAnchor="middle" fill="hsl(var(--accent))" fontFamily="'Bebas Neue', sans-serif" fontSize="11" fontWeight="bold" letterSpacing="2">
-          PAYSL
+        {/* Football */}
+        <ellipse cx="40" cy="31" rx="11" ry="7" fill="none" stroke="hsl(var(--accent))" strokeWidth="1.5" transform="rotate(-20 40 31)" />
+        <path d="M36 33.5L44 28.5M38 34.8L38.7 33M42 27L42.7 25.4M39.4 31.9L40 30.3M40.7 30.6L41.3 29" stroke="hsl(var(--accent))" strokeWidth="1.1" strokeLinecap="round" />
+        {/* POP WARNER text */}
+        <text x="40" y="54" textAnchor="middle" fill="hsl(var(--accent))" fontFamily="'Bebas Neue', sans-serif" fontSize="9" fontWeight="bold" letterSpacing="1.5">
+          POP WARNER
         </text>
-        {/* Year */}
-        <text x="22" y="68" textAnchor="middle" fill="hsl(var(--muted-foreground))" fontFamily="'Bebas Neue', sans-serif" fontSize="6">
-          19
+        <text x="40" y="64" textAnchor="middle" fill="hsl(var(--accent))" fontFamily="'Bebas Neue', sans-serif" fontSize="7" letterSpacing="1">
+          FOOTBALL &amp; CHEER
         </text>
-        <text x="58" y="68" textAnchor="middle" fill="hsl(var(--muted-foreground))" fontFamily="'Bebas Neue', sans-serif" fontSize="6">
-          82
-        </text>
-        <line x1="28" y1="66" x2="52" y2="66" stroke="hsl(var(--accent))" strokeWidth="0.5" strokeOpacity="0.5" />
+        <line x1="28" y1="70" x2="52" y2="70" stroke="hsl(var(--accent))" strokeWidth="0.5" strokeOpacity="0.5" />
       </svg>
     </div>
   );

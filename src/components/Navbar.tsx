@@ -1,13 +1,12 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { ShoppingCart, Users, Menu, X } from "lucide-react";
+import { ShoppingCart, Sparkles, Users, Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { teamConfig } from "@/lib/data";
 import { PFCLogo, PAYSLLogo } from "@/components/PFCLogo";
 import { CartDrawer } from "@/components/CartDrawer";
 import { useCart } from "@/lib/cart";
 import prodigychainLogo from "@/assets/prodigychain-logo.png";
-import singLogo from "@/assets/sing-orthodontics-logo.webp";
 
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -31,18 +30,11 @@ export function Navbar() {
                   <p className="text-xs text-muted-foreground">{teamConfig.season} {teamConfig.sport}</p>
                 </div>
                 <div className="h-8 w-px bg-border/50" />
-                <div className="flex flex-col items-center gap-1">
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-[10px] text-muted-foreground">Powered by</span>
-                    <img 
-                      src={prodigychainLogo} 
-                      alt="Prodigychain" 
-                      className="h-4 w-auto"
-                    />
-                  </div>
-                  <img 
-                    src={singLogo} 
-                    alt="Sing Orthodontics" 
+                <div className="flex items-center gap-1.5">
+                  <span className="text-[10px] text-muted-foreground">Powered by</span>
+                  <img
+                    src={prodigychainLogo}
+                    alt="Prodigychain"
                     className="h-4 w-auto"
                   />
                 </div>
@@ -55,6 +47,12 @@ export function Navbar() {
                 <Button variant="ghost" className="gap-2 text-foreground hover:text-primary hover:bg-primary/10">
                   <Users className="w-4 h-4" />
                   Rosters
+                </Button>
+              </Link>
+              <Link to="/create-card">
+                <Button className="gap-2 btn-primary-glow">
+                  <Sparkles className="w-4 h-4" />
+                  Create Your Card
                 </Button>
               </Link>
               <Button onClick={() => setCartOpen(true)} className="gap-2 bg-accent text-accent-foreground hover:bg-accent/90 btn-gold">
@@ -81,6 +79,12 @@ export function Navbar() {
                   <Button variant="ghost" className="w-full justify-start gap-2 text-foreground">
                     <Users className="w-4 h-4" />
                     Rosters
+                  </Button>
+                </Link>
+                <Link to="/create-card" onClick={() => setIsOpen(false)}>
+                  <Button className="w-full justify-start gap-2">
+                    <Sparkles className="w-4 h-4" />
+                    Create Your Card
                   </Button>
                 </Link>
                 <Button onClick={() => { setCartOpen(true); setIsOpen(false); }} className="w-full justify-start gap-2 bg-accent text-accent-foreground">

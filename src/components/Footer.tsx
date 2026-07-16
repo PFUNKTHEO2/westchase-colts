@@ -32,10 +32,10 @@ export function Footer() {
             <Link to="/roster" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
               Roster
             </Link>
-            <a href="https://pfcsoccer.org/our-programs" target="_blank" rel="noopener noreferrer" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+            <a href="https://www.westchasecolts.com/" target="_blank" rel="noopener noreferrer" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
               Programs
             </a>
-            <a href="mailto:info@pfcsoccer.org" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+            <a href="mailto:info@westchasecolts.com" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
               Contact
             </a>
           </nav>

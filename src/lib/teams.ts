@@ -1,7 +1,7 @@
 export interface Team {
   id: string;
   ageGroup: string;
-  gender: "Boys" | "Girls";
+  gender: "Football" | "Cheer";
   teamPhoto: string;
   players: TeamPlayer[];
 }
@@ -13,38 +13,51 @@ export interface TeamPlayer {
   position: string;
   born: string;
   photo: string;
+  /** Family-written story for the card back (replaces stats). */
+  blurb?: string;
 }
 
-const positions = [
-  "Goalkeeper",
-  "Defender",
-  "Defender",
-  "Defender",
-  "Defender",
-  "Midfielder",
-  "Midfielder",
-  "Midfielder",
-  "Midfielder",
-  "Midfielder",
-  "Forward",
-  "Forward",
-  "Forward",
-  "Forward",
-  "Forward",
+const footballPositions = [
+  "Quarterback",
+  "Running Back",
+  "Running Back",
+  "Wide Receiver",
+  "Wide Receiver",
+  "Tight End",
+  "Offensive Line",
+  "Offensive Line",
+  "Defensive Line",
+  "Defensive Line",
+  "Linebacker",
+  "Linebacker",
+  "Cornerback",
+  "Safety",
+  "Kicker",
+];
+
+const cheerPositions = [
+  "Flyer",
+  "Flyer",
+  "Base",
+  "Base",
+  "Base",
+  "Base",
+  "Backspot",
+  "Backspot",
+  "Tumbler",
+  "Tumbler",
+  "Dancer",
+  "Dancer",
 ];
 
 import teamSilhouette from "@/assets/team-silhouette.png";
 
-const teamPhotos: Record<string, string> = {
-  "boys": teamSilhouette,
-  "girls": teamSilhouette,
-};
-
-const ageGroups = ["U6", "U7", "U8", "U9", "U10", "U11", "U12", "U13", "U14", "U15", "U16", "U17", "U18", "U19"];
-const genders: ("Boys" | "Girls")[] = ["Boys", "Girls"];
-
-// Single silhouette placeholder for all players
+// Single silhouette placeholder for all players until families upload photos
 const playerPhoto = "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/Windows_10_Default_Profile_Picture.svg/512px-Windows_10_Default_Profile_Picture.svg.png";
+
+// Pop Warner divisions the Colts field (football + cheer squads)
+const ageGroups = ["6U", "7U", "8U", "9U", "10U", "12U", "14U"];
+const programs: ("Football" | "Cheer")[] = ["Football", "Cheer"];
 
 function generateBornYear(ageGroup: string): string {
   const ageNum = parseInt(ageGroup.replace("U", ""));
@@ -52,7 +65,8 @@ function generateBornYear(ageGroup: string): string {
   return String(birthYear);
 }
 
-function generatePlayers(teamId: string, ageGroup: string): TeamPlayer[] {
+function generatePlayers(teamId: string, ageGroup: string, program: "Football" | "Cheer"): TeamPlayer[] {
+  const positions = program === "Football" ? footballPositions : cheerPositions;
   return positions.map((pos, i) => ({
     id: `${teamId}-p${i + 1}`,
     name: "Name LastName",
@@ -64,14 +78,14 @@ function generatePlayers(teamId: string, ageGroup: string): TeamPlayer[] {
 }
 
 export const teams: Team[] = ageGroups.flatMap((ag) =>
-  genders.map((gender) => {
-    const id = `${ag.toLowerCase()}-${gender.toLowerCase()}`;
+  programs.map((program) => {
+    const id = `${ag.toLowerCase()}-${program.toLowerCase()}`;
     return {
       id,
       ageGroup: ag,
-      gender,
-      teamPhoto: teamPhotos[gender.toLowerCase()],
-      players: generatePlayers(id, ag),
+      gender: program,
+      teamPhoto: teamSilhouette,
+      players: generatePlayers(id, ag, program),
     };
   })
 );

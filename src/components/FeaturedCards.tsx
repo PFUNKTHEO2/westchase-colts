@@ -24,7 +24,7 @@ export function FeaturedCards() {
             <span className="text-gradient">Featured</span> ProdigyCards
           </h2>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            Collect exclusive digital trading cards of your favorite PAYSL athletes. Each card features
+            Collect exclusive digital trading cards of your favorite Westchase Colts. Each card features
             stunning 3D design and interactive viewing.
           </p>
         </motion.div>

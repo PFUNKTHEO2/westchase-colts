@@ -5,27 +5,27 @@ import programsHero from "@/assets/pfc-programs-hero.jpeg";
 
 const programs = [
   {
-    icon: Users,
-    title: "PAYSL Recreational League",
-    description: "Fun, inclusive soccer for all ages and skill levels. Over 8,000 athletes per season.",
+    icon: Shield,
+    title: "Tackle Football (6U-14U)",
+    description: "Pop Warner tackle football for every age. Real coaching, real fundamentals, Saturday game days at Ed Radice.",
     color: "primary" as const,
   },
   {
     icon: Star,
-    title: "PFC Jr Academy",
-    description: "Developmental program bridging recreational play to competitive soccer. Ages 5-10.",
+    title: "Colts Cheer",
+    description: "Sideline and competition cheer squads that carry Colts spirit from August through Nationals season.",
     color: "accent" as const,
   },
   {
-    icon: Trophy,
-    title: "PFC Select (Competitive)",
-    description: "Elite competitive teams competing in STXCL and regional tournaments across Texas.",
+    icon: Users,
+    title: "Scholarship Fund",
+    description: "No Colt sits out over money. Registration and equipment assistance for families that need it.",
     color: "primary" as const,
   },
   {
-    icon: Shield,
-    title: "Goalkeeper Academy",
-    description: "Specialized training for keepers of all levels with dedicated coaching staff.",
+    icon: Trophy,
+    title: "Playoff & Travel Fund",
+    description: "When our teams punch through to regionals and Pop Warner Nationals, the whole squad travels.",
     color: "accent" as const,
   },
 ];
@@ -46,7 +46,7 @@ export function ProgramsSpotlight() {
             Programs That <span className="text-gradient-gold">Benefit</span>
           </h2>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            Your support directly funds these PAYSL programs serving the Pflugerville community.
+            Your support directly funds these Colts programs serving the Westchase community.
           </p>
         </motion.div>
 

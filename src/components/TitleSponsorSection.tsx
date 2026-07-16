@@ -37,8 +37,8 @@ export function TitleSponsorSection() {
           >
             <div className="bg-white rounded-lg p-6 inline-block">
               <div className="text-center">
-                <h3 className="text-2xl md:text-3xl font-bold text-gray-900">Sing Orthodontics</h3>
-                <p className="text-sm text-gray-600 mt-1">SingSmile™ Your Smile. Our Passion.</p>
+                <h3 className="text-2xl md:text-3xl font-bold text-gray-900">Tech Sherpas</h3>
+                <p className="text-sm text-gray-600 mt-1">IT Training and Certification Experts</p>
               </div>
             </div>
           </Link>

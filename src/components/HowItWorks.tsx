@@ -5,17 +5,17 @@ const steps = [
   {
     icon: CreditCard,
     title: "Choose Your Cards",
-    description: "Browse our roster of PAYSL athletes and collect their exclusive ProdigyCards.",
+    description: "Create your own Colt's card or collect cards from teams across the program.",
   },
   {
     icon: Share2,
     title: "Share & Rally",
-    description: "Share your favorite player cards with family, friends, and the PFC community.",
+    description: "Share your favorite player cards with family, friends, and the Colts community.",
   },
   {
     icon: Heart,
     title: "Fund the Program",
-    description: "Every card directly funds PAYSL programs — training, fields, travel, and scholarships.",
+    description: "Every card directly funds Colts football and cheer: equipment, fields, travel, and scholarships.",
   },
 ];
 
@@ -33,7 +33,7 @@ export function HowItWorks() {
             How It <span className="text-gradient">Works</span>
           </h2>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            Supporting your PAYSL athletes has never been easier. Follow these simple steps to make a difference.
+            Supporting your Colts has never been easier. Follow these simple steps to make a difference.
           </p>
         </motion.div>
 
