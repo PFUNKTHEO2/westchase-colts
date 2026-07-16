@@ -1,3 +1,8 @@
+import coltsGraphicJace from "@/assets/colts-graphic-jace.jpg";
+import coltsPlayer6 from "@/assets/colts-player-6.jpg";
+import coltsActionCelebrate from "@/assets/colts-action-celebrate.jpg";
+import coltsBeAColt from "@/assets/colts-be-a-colt.jpg";
+
 export interface PlayerCard {
   id: string;
   name: string;
@@ -32,33 +37,33 @@ export const teamConfig: TeamConfig = {
 export const playerCards: PlayerCard[] = [
   {
     id: "1",
-    name: "Jaylen Carter",
-    number: "7",
+    name: "Jace Vorlicky",
+    number: "8",
     position: "Quarterback",
-    grade: "12U",
-    front: "https://images.unsplash.com/photo-1560272564-c83b66b1ad12?w=400&h=560&fit=crop",
-    back: "https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=400&h=560&fit=crop",
-    highlight: "Friday night dreams start here",
+    grade: "13U",
+    front: coltsGraphicJace,
+    back: coltsBeAColt,
+    highlight: "Speed. Focus. Relentless.",
   },
   {
     id: "2",
-    name: "Mia Rodriguez",
-    number: "3",
-    position: "Flyer",
-    grade: "10U Cheer",
-    front: "https://images.unsplash.com/photo-1552058544-f2b08422138a?w=400&h=560&fit=crop",
-    back: "https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=400&h=560&fit=crop",
-    highlight: "Fearless at the top of the pyramid",
+    name: "Colts #6",
+    number: "6",
+    position: "Cornerback",
+    grade: "10U",
+    front: coltsPlayer6,
+    back: coltsBeAColt,
+    highlight: "The future is bright",
   },
   {
     id: "3",
-    name: "Marcus Johnson",
-    number: "24",
-    position: "Running Back",
-    grade: "10U",
-    front: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=560&fit=crop",
-    back: "https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=400&h=560&fit=crop",
-    highlight: "Never caught from behind",
+    name: "Game Day",
+    number: "18",
+    position: "Wide Receiver",
+    grade: "8U",
+    front: coltsActionCelebrate,
+    back: coltsBeAColt,
+    highlight: "Touchdown celebration season",
   },
   {
     id: "4",

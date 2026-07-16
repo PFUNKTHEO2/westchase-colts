@@ -3,8 +3,8 @@ import { motion } from "framer-motion";
 import { ArrowRight, Trophy, Users, Target } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { teamConfig, stats } from "@/lib/data";
-import { PFCLogo, PAYSLLogo } from "@/components/PFCLogo";
-import heroBackground from "@/assets/pfc-spring-break-camp.jpg";
+import coltsLogo from "@/assets/westchase-colts-logo.png";
+import heroBackground from "@/assets/colts-hero-team.jpg";
 
 export function Hero() {
   const statItems = [
@@ -36,16 +36,21 @@ export function Hero() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
         >
-          {/* Logos */}
-          <div className="flex items-center justify-center gap-3 mb-6">
-            <PFCLogo size="lg" />
-            <PAYSLLogo size="lg" />
+          {/* Logo */}
+          <div className="flex items-center justify-center mb-6">
+            <img src={coltsLogo} alt="Westchase Colts" className="h-24 md:h-28 w-auto drop-shadow-[0_0_25px_hsl(var(--primary)/0.6)]" />
           </div>
 
-          {/* Badge */}
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent/20 border border-accent/30 mb-6">
-            <span className="w-2 h-2 rounded-full bg-accent animate-pulse" />
-            <span className="text-sm font-medium text-accent">{teamConfig.season} Season Fundraiser</span>
+          {/* Champions badge */}
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent/20 border border-accent/30 mb-3">
+            <Trophy className="w-4 h-4 text-accent" />
+            <span className="text-sm font-medium text-accent">4x Pop Warner National Champions — 2017, 2021, 2024</span>
+          </div>
+          <div className="mb-6">
+            <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/15 border border-primary/30 text-sm font-medium text-foreground">
+              <span className="w-2 h-2 rounded-full bg-accent animate-pulse" />
+              {teamConfig.season} Season Fundraiser
+            </span>
           </div>
 
           {/* Main Heading */}

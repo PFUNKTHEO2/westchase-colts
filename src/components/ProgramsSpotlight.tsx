@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { Users, Star, Trophy, Shield } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
-import programsHero from "@/assets/pfc-programs-hero.jpeg";
+import programsHero from "@/assets/colts-be-a-colt.jpg";
 
 const programs = [
   {

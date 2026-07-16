@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { teamConfig } from "@/lib/data";
-import { PFCLogo, PAYSLLogo } from "@/components/PFCLogo";
+import coltsLogo from "@/assets/westchase-colts-logo.png";
 import prodigychainLogo from "@/assets/prodigychain-logo.png";
 
 export function Footer() {
@@ -13,8 +13,7 @@ export function Footer() {
           {/* Logo & Info */}
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-1">
-              <PFCLogo size="sm" />
-              <PAYSLLogo size="sm" />
+              <img src={coltsLogo} alt="Westchase Colts" className="h-11 w-auto" />
             </div>
             <div>
               <h3 className="font-display font-bold text-lg text-foreground">{teamConfig.name}</h3>

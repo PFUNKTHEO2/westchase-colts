@@ -11,7 +11,7 @@ import { motion } from "framer-motion";
 import { Camera, Check, PenLine, ShoppingCart, Sparkles, UserRound } from "lucide-react";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
-import { PFCLogo } from "@/components/PFCLogo";
+import coltsLogo from "@/assets/westchase-colts-logo.png";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -169,7 +169,7 @@ export default function CreateCard() {
                       </div>
                     )}
                     <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
-                    <div className="absolute left-3 top-3"><PFCLogo size="sm" /></div>
+                    <div className="absolute left-3 top-3"><img src={coltsLogo} alt="" className="h-10 w-auto drop-shadow" /></div>
                     <div className="absolute bottom-0 left-0 right-0 p-4">
                       <p className="text-xs font-medium uppercase tracking-wider text-accent">
                         {position || "Position"} · {team.ageGroup} {team.gender}
@@ -186,7 +186,7 @@ export default function CreateCard() {
                 ) : (
                   <div className="absolute inset-0 flex flex-col bg-gradient-to-b from-secondary to-background p-5">
                     <div className="flex items-center justify-between">
-                      <PFCLogo size="sm" />
+                      <img src={coltsLogo} alt="" className="h-10 w-auto" />
                       <div className="text-right">
                         <p className="font-display text-lg font-bold leading-tight">{playerName || "Player Name"}</p>
                         <p className="text-xs text-muted-foreground">#{jerseyNumber || "00"} · {team.ageGroup} {team.gender}</p>

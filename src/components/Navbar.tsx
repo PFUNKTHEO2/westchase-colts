@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { ShoppingCart, Sparkles, Users, Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { teamConfig } from "@/lib/data";
-import { PFCLogo, PAYSLLogo } from "@/components/PFCLogo";
+import coltsLogo from "@/assets/westchase-colts-logo.png";
 import { CartDrawer } from "@/components/CartDrawer";
 import { useCart } from "@/lib/cart";
 import prodigychainLogo from "@/assets/prodigychain-logo.png";
@@ -21,8 +21,7 @@ export function Navbar() {
             {/* Logo */}
             <Link to="/" className="flex items-center gap-4">
               <div className="flex items-center gap-1">
-                <PFCLogo size="sm" />
-                <PAYSLLogo size="sm" />
+                <img src={coltsLogo} alt="Westchase Colts" className="h-11 w-auto" />
               </div>
               <div className="hidden sm:flex items-center gap-3">
                 <div>
