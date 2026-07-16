@@ -139,13 +139,16 @@ export function TitleSponsorSection() {
                           </Tooltip>
                           :
                         </span>
-                        <span className="text-sm text-muted-foreground">− $1.50</span>
+                        <span className="text-sm text-muted-foreground">− $3.75</span>
                       </div>
                       <div className="h-px bg-border my-2" />
                       <div className="flex justify-between items-center p-3 rounded-lg bg-primary/10">
-                        <span className="text-sm font-medium text-foreground">Goes to the club:</span>
-                        <span className="font-bold text-primary">$13.50</span>
+                        <span className="text-sm font-medium text-foreground">Goes to the club (75%):</span>
+                        <span className="font-bold text-primary">$11.25</span>
                       </div>
+                      <p className="text-xs text-muted-foreground">
+                        Plus a 5% royalty to the Colts every time a digital card is resold. Forever.
+                      </p>
                     </div>
                   </CardContent>
                 </Card>
@@ -188,12 +191,12 @@ export function TitleSponsorSection() {
                           </Tooltip>
                           :
                         </span>
-                        <span className="text-sm text-muted-foreground">− $10.00</span>
+                        <span className="text-sm text-muted-foreground">− $12.00</span>
                       </div>
                       <div className="h-px bg-border my-2" />
                       <div className="flex justify-between items-center p-3 rounded-lg bg-primary/10">
-                        <span className="text-sm font-medium text-foreground">Goes to the club:</span>
-                        <span className="font-bold text-primary">$20.00</span>
+                        <span className="text-sm font-medium text-foreground">Goes to the club (60%):</span>
+                        <span className="font-bold text-primary">$18.00</span>
                       </div>
                     </div>
                   </CardContent>

@@ -1,4 +1,5 @@
 import coltsGraphicJace from "@/assets/colts-graphic-jace.jpg";
+import coltsHeroTeam from "@/assets/colts-hero-team.jpg";
 import coltsPlayer6 from "@/assets/colts-player-6.jpg";
 import coltsActionCelebrate from "@/assets/colts-action-celebrate.jpg";
 import coltsBeAColt from "@/assets/colts-be-a-colt.jpg";
@@ -35,6 +36,16 @@ export const teamConfig: TeamConfig = {
 };
 
 export const playerCards: PlayerCard[] = [
+  {
+    id: "champ13u",
+    name: "13U Colts",
+    number: "25",
+    position: "Championship Edition",
+    grade: "Commemorative",
+    front: coltsHeroTeam,
+    back: coltsBeAColt,
+    highlight: "The championship run, on a card",
+  },
   {
     id: "1",
     name: "Jace Vorlicky",

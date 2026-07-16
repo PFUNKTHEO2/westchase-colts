@@ -324,8 +324,8 @@ export default function CreateCard() {
                     <p className="text-2xl font-bold text-primary">${CARD_PRICES[v]}</p>
                     <p className="mt-1 text-xs text-muted-foreground">
                       {v === "metal"
-                        ? "Printed on metal, pickup at the club. $20 goes to the Colts."
-                        : "Shareable digital collectible. $13.50 goes to the Colts."}
+                        ? "Printed on metal, pickup at the club. $18 (60%) goes to the Colts."
+                        : "Shareable digital collectible. $11.25 (75%) goes to the Colts."}
                     </p>
                   </button>
                 ))}
