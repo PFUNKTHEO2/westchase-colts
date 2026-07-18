@@ -12,7 +12,11 @@ import { teamConfig } from "@/lib/data";
 
 const Roster = () => {
   const [selectedAge, setSelectedAge] = useState<string>("all");
-  const [selectedGender, setSelectedGender] = useState<"all" | "Boys" | "Girls">("all");
+  // Program filter. The PAYSL remix shipped "Boys"/"Girls" buttons, but Colts
+  // teams carry gender: "Football" | "Cheer" — the comparison never matched, so
+  // the filter silently did nothing (David 2026-07-16). Pop Warner's split IS
+  // the program split, so filter on that and label it accordingly.
+  const [selectedGender, setSelectedGender] = useState<"all" | "Football" | "Cheer">("all");
   const [expandedTeam, setExpandedTeam] = useState<string | null>(null);
   const [selectedPlayer, setSelectedPlayer] = useState<TeamPlayer | null>(null);
   const [selectedPlayerTeam, setSelectedPlayerTeam] = useState<Team | null>(null);
@@ -73,9 +77,9 @@ const Roster = () => {
               transition={{ delay: 0.1 }}
               className="flex flex-wrap gap-3 mb-10"
             >
-              {/* Gender filter */}
+              {/* Program filter (Football = boys program, Cheer = girls program) */}
               <div className="flex rounded-lg overflow-hidden border border-border">
-                {(["all", "Boys", "Girls"] as const).map((g) => (
+                {(["all", "Football", "Cheer"] as const).map((g) => (
                   <button
                     key={g}
                     onClick={() => setSelectedGender(g)}
@@ -85,7 +89,7 @@ const Roster = () => {
                         : "bg-card text-muted-foreground hover:text-foreground"
                     }`}
                   >
-                    {g === "all" ? "All" : g}
+                    {g === "all" ? "All" : g === "Football" ? "Football (Boys)" : "Cheer (Girls)"}
                   </button>
                 ))}
               </div>

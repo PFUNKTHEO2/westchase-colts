@@ -15,6 +15,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { playerCards, teamConfig } from "@/lib/data";
+import CardFrame from "@/components/CardFrame";
+import coltsLogo from "@/assets/westchase-colts-logo.png";
 
 const CardPreview = () => {
   const { cardId } = useParams<{ cardId: string }>();
@@ -224,44 +226,22 @@ const CardPreview = () => {
               onTouchStart={handleTouchStart}
               onClick={handleFlip}
             >
-              {/* Card Front */}
+              {/* Card Front — the framed ProdigyChain template in Colts colors
+                  (the frame is the value-add; photo sits in the octagon window) */}
               <div
                 className="absolute inset-0 backface-hidden rounded-2xl overflow-hidden shadow-2xl"
-                style={{
-                  backgroundImage: `url('${player.front}')`,
-                  backgroundSize: "cover",
-                  backgroundPosition: "center",
-                }}
+                style={{ containerType: "inline-size" }}
               >
-                {/* Card Overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent" />
-
-                {/* Card Info */}
-                <div className="absolute bottom-0 left-0 right-0 p-6">
-                  <div className="flex items-end justify-between">
-                    <div>
-                      <p className="text-sm uppercase tracking-wider text-accent font-medium mb-1">
-                        {player.position}
-                      </p>
-                      <h2 className="font-display font-bold text-2xl text-foreground">
-                        {player.name}
-                      </h2>
-                      {player.grade && (
-                        <p className="text-sm text-muted-foreground">{player.grade}</p>
-                      )}
-                    </div>
-                    <div className="w-16 h-16 rounded-xl bg-primary/30 backdrop-blur-sm border border-primary/50 flex items-center justify-center">
-                      <span className="font-display font-bold text-2xl text-primary">
-                        #{player.number}
-                      </span>
-                    </div>
-                  </div>
-                  {player.highlight && (
-                    <div className="mt-4 px-4 py-2 rounded-full bg-accent/20 border border-accent/30 inline-block">
-                      <span className="text-sm font-medium text-accent">{player.highlight}</span>
-                    </div>
-                  )}
-                </div>
+                <CardFrame
+                  photo={player.front}
+                  name={player.name}
+                  number={player.number}
+                  position={player.position}
+                  teamLine={`${player.grade ?? teamConfig.season} · ${teamConfig.name}`}
+                  seasonLine={teamConfig.season}
+                  logo={coltsLogo}
+                  className="absolute inset-0"
+                />
 
                 {/* Holographic Effect */}
                 <div

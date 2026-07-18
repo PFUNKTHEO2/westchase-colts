@@ -18,6 +18,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { teams, type Team, type TeamPlayer } from "@/lib/teams";
 import { teamConfig } from "@/lib/data";
+import CardFrame from "@/components/CardFrame";
 import { CARD_PRICES, useCart, type CardVariant } from "@/lib/cart";
 import { saveRegistration } from "@/lib/registrations";
 
@@ -155,36 +156,26 @@ export default function CreateCard() {
             </div>
 
             <div className="perspective-1000">
-              <div className="relative aspect-[2.5/3.5] overflow-hidden rounded-xl card-glow">
+              <div className="relative aspect-[2.5/3.5] overflow-hidden rounded-xl card-glow" style={{ containerType: "inline-size" }}>
                 {side === "front" ? (
-                  <>
-                    {photo ? (
-                      <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url('${photo}')` }} />
-                    ) : (
-                      <div className="absolute inset-0 flex items-center justify-center bg-secondary">
-                        <div className="px-8 text-center text-sm text-muted-foreground">
-                          <Camera className="mx-auto mb-2 h-8 w-8" />
-                          Your photo goes here
-                        </div>
-                      </div>
-                    )}
-                    <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
-                    <div className="absolute left-3 top-3"><img src={coltsLogo} alt="" className="h-10 w-auto drop-shadow" /></div>
-                    <div className="absolute bottom-0 left-0 right-0 p-4">
-                      <p className="text-xs font-medium uppercase tracking-wider text-accent">
-                        {position || "Position"} · {team.ageGroup} {team.gender}
-                      </p>
-                      <div className="flex items-end justify-between">
-                        <h3 className="font-display text-2xl font-bold">{playerName || "Player Name"}</h3>
-                        <div className="flex h-12 w-12 items-center justify-center rounded-lg border border-primary/30 bg-primary/20">
-                          <span className="font-display text-xl font-bold text-primary">#{jerseyNumber || "00"}</span>
-                        </div>
-                      </div>
-                      <p className="mt-1 text-xs text-muted-foreground">{teamConfig.name} · {teamConfig.season}</p>
-                    </div>
-                  </>
+                  /* The framed card — the frame is the product (ProdigyChain
+                     template in Colts colors; photo sits in the octagon window,
+                     position silhouette until one is uploaded). */
+                  <CardFrame
+                    photo={photo || null}
+                    name={playerName}
+                    number={jerseyNumber}
+                    position={position}
+                    program={team.gender}
+                    teamLine={`${team.ageGroup} ${team.gender} · ${teamConfig.name}`}
+                    seasonLine={teamConfig.season}
+                    logo={coltsLogo}
+                    className="absolute inset-0"
+                  />
                 ) : (
-                  <div className="absolute inset-0 flex flex-col bg-gradient-to-b from-secondary to-background p-5">
+                  /* Back keeps the story layout, inside the same dark frame
+                     border as the front so the flip reads as one object. */
+                  <div className="absolute inset-0 flex flex-col rounded-xl border-[6px] border-[#0b0e14] bg-gradient-to-b from-secondary to-background p-5">
                     <div className="flex items-center justify-between">
                       <img src={coltsLogo} alt="" className="h-10 w-auto" />
                       <div className="text-right">
