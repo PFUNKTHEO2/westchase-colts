@@ -18,7 +18,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { teams, type Team, type TeamPlayer } from "@/lib/teams";
 import { teamConfig } from "@/lib/data";
-import CardFrame from "@/components/CardFrame";
+import CardFrame, { CardBackFrame, DEFAULT_PHOTO_TRANSFORM, type PhotoTransform } from "@/components/CardFrame";
 import { CARD_PRICES, useCart, type CardVariant } from "@/lib/cart";
 import { saveRegistration } from "@/lib/registrations";
 
@@ -48,6 +48,7 @@ export default function CreateCard() {
   // photo
   const fileRef = useRef<HTMLInputElement>(null);
   const [photo, setPhoto] = useState("");
+  const [photoTransform, setPhotoTransform] = useState<PhotoTransform>(DEFAULT_PHOTO_TRANSFORM);
   const [photoWarning, setPhotoWarning] = useState("");
 
   // story
@@ -76,6 +77,7 @@ export default function CreateCard() {
         if (img.height < 700 || img.width < 500) {
           setPhotoWarning("This photo is on the small side; it may look soft when printed. A larger original prints sharper.");
         }
+        setPhotoTransform(DEFAULT_PHOTO_TRANSFORM);
         setPhoto(url);
       };
       img.src = url;
@@ -98,6 +100,7 @@ export default function CreateCard() {
       position,
       blurb: blurb.trim(),
       photo,
+      photoTransform,
     });
     const player: TeamPlayer = {
       id: reg.id,
@@ -107,6 +110,7 @@ export default function CreateCard() {
       born: "",
       photo: reg.photo,
       blurb: reg.blurb,
+      photoTransform: reg.photoTransform,
     };
     addItem(player, team as Team, variant);
     setDone(true);
@@ -115,6 +119,7 @@ export default function CreateCard() {
 
   const reset = () => {
     setPlayerName(""); setJerseyNumber(""); setPosition(""); setPhoto("");
+    setPhotoTransform(DEFAULT_PHOTO_TRANSFORM);
     setBlurb(""); setDone(false); setSide("front");
   };
 
@@ -171,35 +176,28 @@ export default function CreateCard() {
                     seasonLine={teamConfig.season}
                     logo={coltsLogo}
                     className="absolute inset-0"
+                    photoTransform={photoTransform}
+                    onPhotoTransformChange={setPhotoTransform}
                   />
                 ) : (
-                  /* Back keeps the story layout, inside the same dark frame
-                     border as the front so the flip reads as one object. */
-                  <div className="absolute inset-0 flex flex-col rounded-xl border-[6px] border-[#0b0e14] bg-gradient-to-b from-secondary to-background p-5">
-                    <div className="flex items-center justify-between">
-                      <img src={coltsLogo} alt="" className="h-10 w-auto" />
-                      <div className="text-right">
-                        <p className="font-display text-lg font-bold leading-tight">{playerName || "Player Name"}</p>
-                        <p className="text-xs text-muted-foreground">#{jerseyNumber || "00"} · {team.ageGroup} {team.gender}</p>
-                      </div>
-                    </div>
-                    <div className="mt-4 h-px bg-gradient-to-r from-transparent via-primary/60 to-transparent" />
-                    <div className="flex flex-1 items-center">
-                      <p className={`text-sm leading-relaxed ${blurb ? "text-foreground/90" : "italic text-muted-foreground"}`}>
-                        {blurb || "Their story goes here. Written by the family, printed on the card, kept forever."}
-                      </p>
-                    </div>
-                    <div className="h-px bg-gradient-to-r from-transparent via-primary/60 to-transparent" />
-                    <div className="mt-3 flex items-center justify-between text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
-                      <span>{teamConfig.name}</span>
-                      <span>{teamConfig.season}</span>
-                    </div>
-                  </div>
+                  /* Back in the SAME template as the front (matching header,
+                     chevrons, octagon, footer) — the story rides in the window. */
+                  <CardBackFrame
+                    name={playerName}
+                    number={jerseyNumber}
+                    blurb={blurb}
+                    teamLine={`${team.ageGroup} ${team.gender} · ${teamConfig.name}`}
+                    seasonLine={teamConfig.season}
+                    logo={coltsLogo}
+                    className="absolute inset-0"
+                  />
                 )}
               </div>
             </div>
             <p className="mt-3 text-center text-xs text-muted-foreground">
-              Live preview. The printed card carries the same design.
+              {photo && side === "front"
+                ? "Drag the photo to position it. Pinch or use the + and − buttons to zoom."
+                : "Live preview. The printed card carries the same design."}
             </p>
           </div>
 

@@ -15,6 +15,42 @@ export function CartDrawer({ open, onClose }: CartDrawerProps) {
   const { toast } = useToast();
   const [checkingOut, setCheckingOut] = useState(false);
 
+  /**
+   * The cart lives in memory and dies on the Stripe redirect, so we stash a
+   * snapshot in localStorage right before leaving. /checkout/success reads it
+   * back to render the actual card in the mint celebration. If the photo data
+   * URLs blow the storage quota, retry without photos rather than fail.
+   */
+  const snapshotForCelebration = () => {
+    const payload = {
+      ts: Date.now(),
+      items: items.map((i) => ({
+        playerName: i.player.name,
+        number: i.player.number,
+        position: i.player.position,
+        program: i.team.gender,
+        ageGroup: i.team.ageGroup,
+        photo: i.player.photo,
+        photoTransform: i.player.photoTransform,
+        blurb: i.player.blurb,
+        variant: i.variant,
+        quantity: i.quantity,
+      })),
+    };
+    try {
+      localStorage.setItem("wc:last-mint", JSON.stringify(payload));
+    } catch {
+      try {
+        localStorage.setItem(
+          "wc:last-mint",
+          JSON.stringify({ ...payload, items: payload.items.map(({ photo, ...rest }) => rest) }),
+        );
+      } catch {
+        /* celebration falls back to the generic version */
+      }
+    }
+  };
+
   const checkout = async () => {
     setCheckingOut(true);
     try {
@@ -32,6 +68,7 @@ export function CartDrawer({ open, onClose }: CartDrawerProps) {
       });
       const data = await res.json();
       if (!res.ok || !data.url) throw new Error(data.error || "Checkout failed");
+      snapshotForCelebration();
       window.location.href = data.url;
     } catch {
       setCheckingOut(false);

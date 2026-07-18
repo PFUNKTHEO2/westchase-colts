@@ -5,6 +5,9 @@ import { Button } from "@/components/ui/button";
 import type { TeamPlayer, Team } from "@/lib/teams";
 import { useCart, CARD_VARIANT_COLORS, CARD_PRICES, type CardVariant } from "@/lib/cart";
 import { toast } from "@/hooks/use-toast";
+import CardFrame from "@/components/CardFrame";
+import { teamConfig } from "@/lib/data";
+import coltsLogo from "@/assets/westchase-colts-logo.png";
 
 interface PlayerDetailModalProps {
   player: TeamPlayer | null;
@@ -63,16 +66,25 @@ export function PlayerDetailModal({ player, team, onClose }: PlayerDetailModalPr
 
           {/* Player image + stats side by side */}
           <div className="flex gap-0">
-            {/* Player image */}
-            <div className="relative w-[45%] shrink-0 aspect-[3/4] overflow-hidden bg-gradient-to-br from-primary/20 via-background to-accent/10">
-              <img src={player.photo} alt={player.name} className="w-full h-full object-cover" />
-              <div className="absolute inset-0 bg-gradient-to-t from-card via-transparent to-transparent" />
-              <div className="absolute bottom-3 left-3 right-3">
-                <div className="flex items-center gap-1.5 mb-0.5">
-                  <Star className="w-3 h-3 text-accent fill-accent" />
-                  <span className="text-[10px] uppercase tracking-widest text-accent font-semibold">ProdigyCard</span>
-                </div>
-                <h2 className="font-display font-bold text-lg text-foreground leading-tight">{player.name}</h2>
+            {/* The player's ProdigyCard — the template IS the profile image
+               (photo when uploaded, position silhouette until then) */}
+            <div className="w-[45%] shrink-0 p-3">
+              <div className="flex items-center gap-1.5 mb-2">
+                <Star className="w-3 h-3 text-accent fill-accent" />
+                <span className="text-[10px] uppercase tracking-widest text-accent font-semibold">ProdigyCard</span>
+              </div>
+              <div className="relative aspect-[2.5/3.5] overflow-hidden rounded-xl" style={{ containerType: "inline-size" }}>
+                <CardFrame
+                  photo={player.photo || null}
+                  name={player.name}
+                  number={player.number}
+                  position={player.position}
+                  program={team.gender}
+                  teamLine={`${team.ageGroup} ${team.gender} · ${teamConfig.name}`}
+                  seasonLine={teamConfig.season}
+                  logo={coltsLogo}
+                  className="absolute inset-0"
+                />
               </div>
             </div>
 

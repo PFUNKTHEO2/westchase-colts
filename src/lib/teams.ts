@@ -15,6 +15,8 @@ export interface TeamPlayer {
   photo: string;
   /** Family-written story for the card back (replaces stats). */
   blurb?: string;
+  /** crop the family chose in the editor; lets the celebration card match */
+  photoTransform?: { x: number; y: number; scale: number };
 }
 
 const footballPositions = [
@@ -52,8 +54,10 @@ const cheerPositions = [
 
 import teamSilhouette from "@/assets/team-silhouette.png";
 
-// Single silhouette placeholder for all players until families upload photos
-const playerPhoto = "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/Windows_10_Default_Profile_Picture.svg/512px-Windows_10_Default_Profile_Picture.svg.png";
+// No photo until a family uploads one — CardFrame renders the position
+// silhouette in the octagon window (the hotlinked generic avatar was the
+// "error" David flagged on player profiles).
+const playerPhoto = "";
 
 // Pop Warner divisions the Colts field (football + cheer squads)
 const ageGroups = ["6U", "7U", "8U", "9U", "10U", "12U", "14U"];

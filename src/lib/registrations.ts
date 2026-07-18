@@ -18,6 +18,8 @@ export interface CardRegistration {
   blurb: string;
   /** data-URL of the uploaded photo (demo); becomes a storage path in prod. */
   photo: string;
+  /** crop/zoom the parent set in the frame (CardFrame PhotoTransform) */
+  photoTransform?: { x: number; y: number; scale: number };
 }
 
 const KEY = "colts_card_registrations";
