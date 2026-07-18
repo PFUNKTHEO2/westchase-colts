@@ -1,6 +1,8 @@
+import { useState } from "react";
 import { X, Trash2, ShoppingCart, Plus, Minus } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
 import { useCart, CARD_VARIANT_COLORS, CARD_PRICES } from "@/lib/cart";
 
 interface CartDrawerProps {
@@ -10,6 +12,36 @@ interface CartDrawerProps {
 
 export function CartDrawer({ open, onClose }: CartDrawerProps) {
   const { items, removeItem, updateQuantity, clearCart, total } = useCart();
+  const { toast } = useToast();
+  const [checkingOut, setCheckingOut] = useState(false);
+
+  const checkout = async () => {
+    setCheckingOut(true);
+    try {
+      const res = await fetch("/api/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          items: items.map((i) => ({
+            variant: i.variant,
+            quantity: i.quantity,
+            playerName: i.player.name,
+            teamLabel: `${i.team.ageGroup} ${i.team.gender}`,
+          })),
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.url) throw new Error(data.error || "Checkout failed");
+      window.location.href = data.url;
+    } catch {
+      setCheckingOut(false);
+      toast({
+        title: "Checkout could not start",
+        description: "Please try again in a moment.",
+        variant: "destructive",
+      });
+    }
+  };
 
   return (
     <AnimatePresence>
@@ -110,8 +142,12 @@ export function CartDrawer({ open, onClose }: CartDrawerProps) {
                   <span className="text-sm text-muted-foreground">Total</span>
                   <span className="font-display font-bold text-xl text-foreground">${total}</span>
                 </div>
-                <Button className="w-full gap-2 bg-accent text-accent-foreground hover:bg-accent/90 btn-gold font-semibold text-base">
-                  Complete Purchase
+                <Button
+                  onClick={checkout}
+                  disabled={checkingOut}
+                  className="w-full gap-2 bg-accent text-accent-foreground hover:bg-accent/90 btn-gold font-semibold text-base"
+                >
+                  {checkingOut ? "Opening secure checkout..." : "Complete Purchase"}
                 </Button>
                 <Button onClick={clearCart} variant="ghost" size="sm" className="w-full text-muted-foreground">
                   Clear Cart
