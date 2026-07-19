@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { PlayerDetailModal } from "@/components/PlayerDetailModal";
-import { teams, ageGroupList, type Team, type TeamPlayer } from "@/lib/teams";
+import { teams, teamsWithCards, ageGroupList, type Team, type TeamPlayer } from "@/lib/teams";
 import { teamConfig } from "@/lib/data";
 
 const Roster = () => {
@@ -21,7 +21,9 @@ const Roster = () => {
   const [selectedPlayer, setSelectedPlayer] = useState<TeamPlayer | null>(null);
   const [selectedPlayerTeam, setSelectedPlayerTeam] = useState<Team | null>(null);
 
-  const filteredTeams = teams.filter((t) => {
+  // family-created cards fall into place on their team's roster
+  const allTeams = useMemo(() => teamsWithCards(), []);
+  const filteredTeams = allTeams.filter((t) => {
     if (selectedAge !== "all" && t.ageGroup !== selectedAge) return false;
     if (selectedGender !== "all" && t.gender !== selectedGender) return false;
     return true;

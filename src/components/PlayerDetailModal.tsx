@@ -7,6 +7,7 @@ import { useCart, CARD_VARIANT_COLORS, CARD_PRICES, type CardVariant } from "@/l
 import { toast } from "@/hooks/use-toast";
 import CardFrame from "@/components/CardFrame";
 import { teamConfig } from "@/lib/data";
+import { statsForPlayer, useMintFeed } from "@/lib/mints";
 import coltsLogo from "@/assets/westchase-colts-logo.png";
 
 interface PlayerDetailModalProps {
@@ -18,8 +19,12 @@ interface PlayerDetailModalProps {
 export function PlayerDetailModal({ player, team, onClose }: PlayerDetailModalProps) {
   const { addItem, items } = useCart();
   const [metalQty, setMetalQty] = useState(1);
+  const feed = useMintFeed();
 
   if (!player || !team) return null;
+
+  // this card's live scoreboard: sold count + dollars back to the club
+  const cardStats = statsForPlayer(feed, player.name, `${team.ageGroup} ${team.gender}`);
 
   const digitalInCart = items.some((i) => i.id === `${player.id}-digital`);
   const metalInCart = items.find((i) => i.id === `${player.id}-metal`);
@@ -76,6 +81,7 @@ export function PlayerDetailModal({ player, team, onClose }: PlayerDetailModalPr
               <div className="relative aspect-[2.5/3.5] overflow-hidden rounded-xl" style={{ containerType: "inline-size" }}>
                 <CardFrame
                   photo={player.photo || null}
+                  photoTransform={player.photoTransform}
                   name={player.name}
                   number={player.number}
                   position={player.position}
@@ -105,6 +111,21 @@ export function PlayerDetailModal({ player, team, onClose }: PlayerDetailModalPr
           </div>
 
           <div className="p-5 space-y-4">
+            {cardStats && (
+              <div className="rounded-lg border border-accent/40 bg-accent/10 px-4 py-2.5 text-center">
+                <p className="font-display font-bold text-foreground">
+                  {cardStats.sold} {cardStats.sold === 1 ? "card" : "cards"} sold · $
+                  {cardStats.raised.toLocaleString()} back to the Colts
+                </p>
+              </div>
+            )}
+
+            {player.blurb && (
+              <p className="text-sm italic leading-relaxed text-foreground/80 text-center">
+                &ldquo;{player.blurb}&rdquo;
+              </p>
+            )}
+
             {/* Purchase buttons side by side */}
             <div className="grid grid-cols-2 gap-3">
               {/* Digital column */}

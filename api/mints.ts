@@ -59,16 +59,23 @@ export default async function handler(req: any, res: any) {
 
   let count = 0;
   let raised = 0;
+  let supporters = 0;
   const recent: { name: string; teamLabel: string; variant: string; ts: number }[] = [];
+  // per-card metrics for the gallery/roster: how many sold, dollars to the club
+  const byPlayer = new Map<string, { name: string; teamLabel: string; sold: number; raised: number }>();
 
   sessions.data.forEach((s: any, idx: number) => {
     const items = lineItemLists[idx]?.data;
     if (!Array.isArray(items)) return;
+    let sessionHadCard = false;
     for (const li of items) {
       const desc = typeof li.description === "string" ? li.description : "";
       const { variant, playerName, teamLabel } = parseItem(desc);
       if (!variant) continue;
+      // internal test orders never reach the public wall
+      if (/^(demo|test|sample|mint)\b/i.test(playerName)) continue;
       const qty = Number.isInteger(li.quantity) ? li.quantity : 1;
+      sessionHadCard = true;
       count += qty;
       raised += CLUB_CUT[variant] * qty;
       recent.push({
@@ -77,15 +84,27 @@ export default async function handler(req: any, res: any) {
         variant,
         ts: (s.created ?? 0) * 1000,
       });
+      const pubName = publicName(playerName);
+      const pKey = `${pubName}|${teamLabel}`.toLowerCase();
+      const p = byPlayer.get(pKey) ?? { name: pubName, teamLabel, sold: 0, raised: 0 };
+      p.sold += qty;
+      p.raised += CLUB_CUT[variant] * qty;
+      byPlayer.set(pKey, p);
     }
+    if (sessionHadCard) supporters += 1;
   });
 
   recent.sort((a, b) => b.ts - a.ts);
+  const players = [...byPlayer.values()]
+    .map((p) => ({ ...p, raised: Math.round(p.raised * 100) / 100 }))
+    .sort((a, b) => b.raised - a.raised);
 
   res.setHeader("Cache-Control", "public, s-maxage=60, stale-while-revalidate=300");
   return res.status(200).json({
     count,
     raised: Math.round(raised * 100) / 100,
+    supporters,
     recent: recent.slice(0, 12),
+    players: players.slice(0, 50),
   });
 }

@@ -95,3 +95,36 @@ export const teams: Team[] = ageGroups.flatMap((ag) =>
 );
 
 export const ageGroupList = ageGroups;
+
+import { listRegistrations } from "@/lib/registrations";
+
+/**
+ * Teams with family-created cards merged in. A created card claims the
+ * placeholder roster row with the same jersey number on its team (or joins at
+ * the top), so a card made in /create-card falls into place on the roster.
+ */
+export function teamsWithCards(): Team[] {
+  const regs = listRegistrations();
+  if (regs.length === 0) return teams;
+  return teams.map((t) => {
+    const mine = regs.filter((r) => r.division === t.ageGroup && r.program === t.gender);
+    if (mine.length === 0) return t;
+    const players = [...t.players];
+    for (const r of mine) {
+      const real: TeamPlayer = {
+        id: r.id,
+        name: r.playerName,
+        number: r.jerseyNumber,
+        position: r.position,
+        born: "",
+        photo: r.photo,
+        blurb: r.blurb,
+        photoTransform: r.photoTransform,
+      };
+      const slot = players.findIndex((p) => p.number === r.jerseyNumber);
+      if (slot >= 0) players[slot] = real;
+      else players.unshift(real);
+    }
+    return { ...t, players };
+  });
+}

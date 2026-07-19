@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { motion } from "framer-motion";
@@ -15,12 +15,52 @@ import {
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { playerCards, teamConfig } from "@/lib/data";
-import CardFrame from "@/components/CardFrame";
+import CardFrame, { CardBackFrame, DEFAULT_PHOTO_TRANSFORM } from "@/components/CardFrame";
+import { findFeaturedCard } from "@/lib/featured";
+import { listRegistrations } from "@/lib/registrations";
+import { statsForPlayer, useMintFeed } from "@/lib/mints";
 import coltsLogo from "@/assets/westchase-colts-logo.png";
 
 const CardPreview = () => {
   const { cardId } = useParams<{ cardId: string }>();
+  // legacy image-cards (curated graphics) still resolve; frame cards
+  // (the featured showcase + family-created registrations) render the real
+  // ProdigyCard template on BOTH 3D faces.
   const player = playerCards.find((p) => p.id === cardId);
+  const frameCard = useMemo(() => {
+    if (!cardId) return undefined;
+    const f = findFeaturedCard(cardId);
+    if (f) return f;
+    const r = listRegistrations().find((reg) => reg.id === cardId);
+    if (!r) return undefined;
+    return {
+      id: r.id,
+      playerName: r.playerName,
+      jerseyNumber: r.jerseyNumber,
+      position: r.position,
+      program: r.program as "Football" | "Cheer",
+      division: r.division,
+      blurb: r.blurb,
+      photo: r.photo,
+      photoTransform: r.photoTransform ?? DEFAULT_PHOTO_TRANSFORM,
+    };
+  }, [cardId]);
+
+  const display = frameCard
+    ? {
+        name: frameCard.playerName,
+        number: frameCard.jerseyNumber,
+        position: frameCard.position,
+        front: frameCard.photo,
+      }
+    : player
+    ? { name: player.name, number: player.number, position: player.position, front: player.front }
+    : null;
+
+  const feed = useMintFeed();
+  const cardStats = frameCard
+    ? statsForPlayer(feed, frameCard.playerName, `${frameCard.division} ${frameCard.program}`)
+    : null;
 
   const [isFlipped, setIsFlipped] = useState(false);
   const [rotation, setRotation] = useState({ x: 0, y: 0 });
@@ -108,8 +148,8 @@ const CardPreview = () => {
 
   // Social sharing
   const shareUrl = window.location.href;
-  const shareText = player
-    ? `Check out ${player.name}'s player card from the ${teamConfig.name}!`
+  const shareText = display
+    ? `Check out ${display.name}'s player card from the ${teamConfig.name}!`
     : "";
 
   const handleShare = (platform: string) => {
@@ -145,7 +185,7 @@ const CardPreview = () => {
     }
   };
 
-  if (!player) {
+  if (!display) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
@@ -162,18 +202,18 @@ const CardPreview = () => {
     <>
       <Helmet>
         <title>
-          {player.name} #{player.number} - {teamConfig.name}
+          {display.name} #{display.number} - {teamConfig.name}
         </title>
         <meta
           name="description"
-          content={`View ${player.name}'s interactive 3D player card. ${player.position} for the ${teamConfig.name}.`}
+          content={`View ${display.name}'s interactive 3D player card. ${display.position} for the ${teamConfig.name}.`}
         />
-        <meta property="og:title" content={`${player.name} - ${teamConfig.name}`} />
-        <meta property="og:description" content={`${player.position} #${player.number}`} />
-        <meta property="og:image" content={player.front} />
+        <meta property="og:title" content={`${display.name} - ${teamConfig.name}`} />
+        <meta property="og:description" content={`${display.position} #${display.number}`} />
+        <meta property="og:image" content={display.front} />
         <meta property="og:type" content="website" />
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:image" content={player.front} />
+        <meta name="twitter:image" content={display.front} />
       </Helmet>
 
       <div className="min-h-screen bg-background">
@@ -189,9 +229,14 @@ const CardPreview = () => {
               </Link>
 
               <div className="text-center">
-                <h1 className="font-display font-bold text-gradient">{player.name}</h1>
+                <h1 className="font-display font-bold text-gradient">{display.name}</h1>
                 <p className="text-xs text-muted-foreground">
-                  #{player.number} • {player.position}
+                  #{display.number} • {display.position}
+                  {cardStats && (
+                    <span className="ml-2 text-accent font-semibold">
+                      {cardStats.sold} sold · ${cardStats.raised.toLocaleString()} to the Colts
+                    </span>
+                  )}
                 </p>
               </div>
 
@@ -232,16 +277,31 @@ const CardPreview = () => {
                 className="absolute inset-0 backface-hidden rounded-2xl overflow-hidden shadow-2xl"
                 style={{ containerType: "inline-size" }}
               >
-                <CardFrame
-                  photo={player.front}
-                  name={player.name}
-                  number={player.number}
-                  position={player.position}
-                  teamLine={`${player.grade ?? teamConfig.season} · ${teamConfig.name}`}
-                  seasonLine={teamConfig.season}
-                  logo={coltsLogo}
-                  className="absolute inset-0"
-                />
+                {frameCard ? (
+                  <CardFrame
+                    photo={frameCard.photo}
+                    photoTransform={frameCard.photoTransform}
+                    name={frameCard.playerName}
+                    number={frameCard.jerseyNumber}
+                    position={frameCard.position}
+                    program={frameCard.program}
+                    teamLine={`${frameCard.division} ${frameCard.program} · ${teamConfig.name}`}
+                    seasonLine={teamConfig.season}
+                    logo={coltsLogo}
+                    className="absolute inset-0"
+                  />
+                ) : (
+                  <CardFrame
+                    photo={player!.front}
+                    name={player!.name}
+                    number={player!.number}
+                    position={player!.position}
+                    teamLine={`${player!.grade ?? teamConfig.season} · ${teamConfig.name}`}
+                    seasonLine={teamConfig.season}
+                    logo={coltsLogo}
+                    className="absolute inset-0"
+                  />
+                )}
 
                 {/* Holographic Effect */}
                 <div
@@ -254,45 +314,53 @@ const CardPreview = () => {
                 />
               </div>
 
-              {/* Card Back */}
+              {/* Card Back — same template as the front for frame cards; the
+                  story rides in the octagon window */}
               <div
                 className="absolute inset-0 backface-hidden rounded-2xl overflow-hidden shadow-2xl"
-                style={{
-                  backgroundImage: `url('${player.back}')`,
-                  backgroundSize: "cover",
-                  backgroundPosition: "center",
-                  transform: "rotateY(180deg)",
-                }}
+                style={{ transform: "rotateY(180deg)", containerType: "inline-size" }}
               >
-                <div className="absolute inset-0 bg-card/90 backdrop-blur-sm p-6 flex flex-col justify-center">
-                  <div className="text-center">
-                    <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center">
-                      <span className="font-display font-bold text-3xl text-background">
-                        #{player.number}
-                      </span>
-                    </div>
-                    <h3 className="font-display font-bold text-2xl text-gradient mb-2">
-                      {player.name}
-                    </h3>
-                    <p className="text-accent font-medium mb-4">{player.position}</p>
-                    {player.grade && (
-                      <p className="text-muted-foreground mb-4">{player.grade}</p>
-                    )}
-                    {player.highlight && (
-                      <div className="px-4 py-2 rounded-lg bg-accent/20 border border-accent/30">
-                        <span className="text-sm text-accent">{player.highlight}</span>
+                {frameCard ? (
+                  <CardBackFrame
+                    name={frameCard.playerName}
+                    number={frameCard.jerseyNumber}
+                    blurb={frameCard.blurb}
+                    teamLine={`${frameCard.division} ${frameCard.program} · ${teamConfig.name}`}
+                    seasonLine={teamConfig.season}
+                    logo={coltsLogo}
+                    className="absolute inset-0"
+                  />
+                ) : (
+                  <div className="absolute inset-0 bg-card/90 backdrop-blur-sm p-6 flex flex-col justify-center">
+                    <div className="text-center">
+                      <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center">
+                        <span className="font-display font-bold text-3xl text-background">
+                          #{player!.number}
+                        </span>
                       </div>
-                    )}
-                    <div className="mt-6 pt-4 border-t border-border">
-                      <p className="font-display text-sm text-muted-foreground">
-                        {teamConfig.name}
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        {teamConfig.season} {teamConfig.sport}
-                      </p>
+                      <h3 className="font-display font-bold text-2xl text-gradient mb-2">
+                        {player!.name}
+                      </h3>
+                      <p className="text-accent font-medium mb-4">{player!.position}</p>
+                      {player!.grade && (
+                        <p className="text-muted-foreground mb-4">{player!.grade}</p>
+                      )}
+                      {player!.highlight && (
+                        <div className="px-4 py-2 rounded-lg bg-accent/20 border border-accent/30">
+                          <span className="text-sm text-accent">{player!.highlight}</span>
+                        </div>
+                      )}
+                      <div className="mt-6 pt-4 border-t border-border">
+                        <p className="font-display text-sm text-muted-foreground">
+                          {teamConfig.name}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {teamConfig.season} {teamConfig.sport}
+                        </p>
+                      </div>
                     </div>
                   </div>
-                </div>
+                )}
               </div>
             </motion.div>
           </div>
@@ -347,14 +415,16 @@ const CardPreview = () => {
               >
                 <Link2 className="w-5 h-5" />
               </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={handleDownload}
-                className="text-accent hover:bg-accent/10"
-              >
-                <Download className="w-5 h-5" />
-              </Button>
+              {player && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={handleDownload}
+                  className="text-accent hover:bg-accent/10"
+                >
+                  <Download className="w-5 h-5" />
+                </Button>
+              )}
             </div>
           </div>
         </div>

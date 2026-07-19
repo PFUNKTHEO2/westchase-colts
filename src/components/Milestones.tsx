@@ -1,8 +1,12 @@
 import { motion } from "framer-motion";
 import { Check, Lock } from "lucide-react";
-import { milestones, teamConfig } from "@/lib/data";
+import { milestones } from "@/lib/data";
+import { useMintFeed } from "@/lib/mints";
 
 export function Milestones() {
+  // reached/next computed from live dollars raised — nothing pre-checked
+  const raised = useMintFeed()?.raised ?? 0;
+  const withStatus = milestones.map((m) => ({ ...m, reached: raised >= m.amount }));
   return (
     <section className="py-20 relative overflow-hidden">
       {/* Background Glow */}
@@ -29,10 +33,10 @@ export function Milestones() {
             {/* Timeline Line */}
             <div className="absolute left-6 top-0 bottom-0 w-0.5 bg-gradient-to-b from-primary via-accent to-muted" />
 
-            {milestones.map((milestone, index) => {
+            {withStatus.map((milestone, index) => {
               const isNext =
                 !milestone.reached &&
-                (index === 0 || milestones[index - 1].reached);
+                (index === 0 || withStatus[index - 1].reached);
 
               return (
                 <motion.div
@@ -110,10 +114,7 @@ export function Milestones() {
                           <motion.div
                             initial={{ width: 0 }}
                             whileInView={{
-                              width: `${Math.min(
-                                100,
-                                (teamConfig.currentAmount / milestone.amount) * 100
-                              )}%`,
+                              width: `${Math.min(100, (raised / milestone.amount) * 100)}%`,
                             }}
                             viewport={{ once: true }}
                             transition={{ duration: 1, delay: 0.5 }}
@@ -121,7 +122,7 @@ export function Milestones() {
                           />
                         </div>
                         <p className="text-xs text-muted-foreground mt-2">
-                          ${(milestone.amount - teamConfig.currentAmount).toLocaleString()} to go
+                          ${Math.max(0, milestone.amount - raised).toLocaleString()} to go
                         </p>
                       </div>
                     )}

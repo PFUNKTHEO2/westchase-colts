@@ -4,6 +4,7 @@ import { Hero } from "@/components/Hero";
 import { SponsorBanner } from "@/components/SponsorBanner";
 import { TitleSponsorSection } from "@/components/TitleSponsorSection";
 
+import { CardGallery } from "@/components/CardGallery";
 import { MintWall } from "@/components/MintWall";
 import { ProgramsSpotlight } from "@/components/ProgramsSpotlight";
 import { HowItWorks } from "@/components/HowItWorks";
@@ -37,6 +38,7 @@ const Index = () => {
         <Navbar />
         <main>
           <Hero />
+          <CardGallery />
           <MintWall />
           <SponsorBanner />
           <TitleSponsorSection />

@@ -1,6 +1,8 @@
 import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
 import { Trophy, Medal, Award } from "lucide-react";
-import { leaderboard } from "@/lib/data";
+import { Button } from "@/components/ui/button";
+import { useMintFeed } from "@/lib/mints";
 
 const getRankIcon = (rank: number) => {
   switch (rank) {
@@ -29,6 +31,15 @@ const getRankStyle = (rank: number) => {
 };
 
 export function Leaderboard() {
+  // live: top cards by dollars raised for the club (privacy-safe names)
+  const feed = useMintFeed();
+  const top = (feed?.players ?? []).slice(0, 5).map((p, i) => ({
+    name: `${p.name} · ${p.teamLabel}`,
+    amount: p.raised,
+    sold: p.sold,
+    rank: i + 1,
+  }));
+
   return (
     <section className="py-20 bg-gradient-to-b from-secondary/50 to-background">
       <div className="container mx-auto px-4">
@@ -39,15 +50,25 @@ export function Leaderboard() {
           className="text-center mb-12"
         >
           <h2 className="section-heading mb-4">
-            Top <span className="text-gradient-gold">Supporters</span>
+            Top <span className="text-gradient-gold">Cards</span>
           </h2>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            A huge thank you to our most generous supporters who are making this season possible!
+            {top.length > 0
+              ? "The cards raising the most for the Colts this season."
+              : "The season leaderboard starts empty. The first card sold takes the top spot."}
           </p>
         </motion.div>
 
+        {top.length === 0 && (
+          <div className="text-center">
+            <Button asChild size="lg" className="btn-primary-glow bg-primary hover:bg-primary/90">
+              <Link to="/create-card">Put your Colt on the board</Link>
+            </Button>
+          </div>
+        )}
+
         <div className="max-w-2xl mx-auto space-y-4">
-          {leaderboard.map((supporter, index) => (
+          {top.map((supporter, index) => (
             <motion.div
               key={supporter.name}
               initial={{ opacity: 0, x: -20 }}
@@ -76,7 +97,9 @@ export function Leaderboard() {
                 >
                   {supporter.name}
                 </h3>
-                <p className="text-sm text-muted-foreground">Rank #{supporter.rank}</p>
+                <p className="text-sm text-muted-foreground">
+                  {supporter.sold} {supporter.sold === 1 ? "card" : "cards"} sold · raised for the Colts
+                </p>
               </div>
 
               {/* Amount */}

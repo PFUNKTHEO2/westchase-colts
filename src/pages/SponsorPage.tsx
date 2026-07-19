@@ -9,10 +9,13 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { PFCLogo } from "@/components/PFCLogo";
 import { titleSponsor, teamConfig } from "@/lib/data";
+import { useMintFeed } from "@/lib/mints";
 import sponsorHero from "@/assets/pfc-spring-break-camp.jpg";
 
 export default function SponsorPage() {
-  const progressPercent = (titleSponsor.cardsSold / titleSponsor.cardsForPrize) * 100;
+  // live cards-sold count toward the sponsor prize (zero until sales start)
+  const cardsSold = useMintFeed()?.count ?? 0;
+  const progressPercent = (cardsSold / titleSponsor.cardsForPrize) * 100;
 
   return (
     <>
@@ -117,12 +120,12 @@ export default function SponsorPage() {
                       <div className="flex justify-between text-sm mb-2">
                         <span className="text-muted-foreground">Cards Sold</span>
                         <span className="font-semibold text-foreground">
-                          {titleSponsor.cardsSold} / {titleSponsor.cardsForPrize}
+                          {cardsSold} / {titleSponsor.cardsForPrize}
                         </span>
                       </div>
                       <Progress value={progressPercent} className="h-3" />
                       <p className="text-center text-sm text-muted-foreground mt-2">
-                        {titleSponsor.cardsForPrize - titleSponsor.cardsSold} more cards to unlock the prize!
+                        {Math.max(0, titleSponsor.cardsForPrize - cardsSold)} more cards to unlock the prize!
                       </p>
                     </div>
 

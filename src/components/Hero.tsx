@@ -2,15 +2,22 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowRight, Trophy, Users, Target } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { teamConfig, stats } from "@/lib/data";
+import { teamConfig } from "@/lib/data";
+import { useMintFeed } from "@/lib/mints";
 import coltsLogo from "@/assets/westchase-colts-logo.png";
 import heroBackground from "@/assets/colts-hero-team.jpg";
 
+function money(n: number): string {
+  return n >= 1000 ? `$${(n / 1000).toFixed(1)}K` : `$${Math.round(n)}`;
+}
+
 export function Hero() {
+  // live numbers from Stripe via /api/mints — zeros are real zeros
+  const feed = useMintFeed();
   const statItems = [
-    { icon: Trophy, value: `$${(stats.totalRaised / 1000).toFixed(1)}K`, label: "Raised" },
-    { icon: Users, value: stats.supporters.toString(), label: "Supporters" },
-    { icon: Target, value: stats.cardsSold.toString(), label: "Cards Sold" },
+    { icon: Trophy, value: money(feed?.raised ?? 0), label: "Raised" },
+    { icon: Users, value: String(feed?.supporters ?? 0), label: "Supporters" },
+    { icon: Target, value: String(feed?.count ?? 0), label: "Cards Sold" },
   ];
 
   return (
