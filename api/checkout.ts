@@ -3,15 +3,26 @@
  * Prices are resolved server-side from the variant; the client never sends
  * amounts. Talks to Stripe over raw REST so no SDK dependency is needed.
  * STRIPE_SECRET_KEY decides the mode: sk_test_ = test mode, sk_live_ = live.
+ *
+ * CLUB_SLUG tags every session (metadata.club) so /api/mints can filter to
+ * this club only — club sites share one Stripe sandbox account, and without
+ * this tag each site's live wall would read every other club's sales too
+ * (caught 7/20 building the Rangers clone: Rangers' wall was showing a stray
+ * Colts-era test charge).
  */
+const CLUB_SLUG = "colts";
+// 50/50 split, per David's pricing pass (7/20): half to the club, half
+// covers card creation, payment processing, and the platform fee.
 const PRICES_CENTS: Record<string, number> = {
-  digital: 1500,
-  metal: 3000,
+  digital: 1000,
+  metal: 2000,
+  postcard: 3800,
 };
 
 const LABELS: Record<string, string> = {
   digital: "Digital ProdigyCard",
-  metal: "Metal Physical ProdigyCard",
+  metal: "Physical Trading Card",
+  postcard: "ProdigyCard Postcard (5.5x8.5)",
 };
 
 export default async function handler(req: any, res: any) {
@@ -46,6 +57,7 @@ export default async function handler(req: any, res: any) {
   params.set("mode", "payment");
   params.set("success_url", `${origin}/checkout/success`);
   params.set("cancel_url", `${origin}/create-card`);
+  params.set("metadata[club]", CLUB_SLUG);
   valid.forEach((item: any, idx: number) => {
     const detail = [item.playerName, item.teamLabel]
       .filter((v: any) => typeof v === "string" && v.trim())
@@ -57,7 +69,7 @@ export default async function handler(req: any, res: any) {
     params.set(`line_items[${idx}][price_data][unit_amount]`, String(PRICES_CENTS[item.variant]));
     params.set(`line_items[${idx}][price_data][product_data][name]`, name);
   });
-  if (valid.some((i: any) => i.variant === "metal")) {
+  if (valid.some((i: any) => i.variant === "metal" || i.variant === "postcard")) {
     params.set("shipping_address_collection[allowed_countries][0]", "US");
   }
 

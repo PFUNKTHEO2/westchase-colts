@@ -1,15 +1,30 @@
 /**
- * GET /api/mints — live mint feed straight from Stripe (no database).
+ * GET /api/mints — live card feed straight from Stripe (no database).
  * Reads completed Checkout Sessions, counts card line items, computes the
- * club's cut (metal $18 of $30, digital $11.25 of $15) and returns the most
- * recent mints as privacy-safe chips (first name + last initial, team,
- * variant) for the public Mint Wall. Cached at the edge for 60s.
+ * club's 50/50 cut (metal $10 of $20, digital $5 of $10, postcard $19 of
+ * $38) and returns the most recent cards as privacy-safe chips (first name
+ * + last initial, team, variant) for the public Card Wall. Cached 60s.
  */
-const CLUB_CUT: Record<string, number> = { metal: 18, digital: 11.25 };
+const CLUB_CUT: Record<string, number> = { metal: 10, digital: 5, postcard: 19 };
 
-// "Metal Physical ProdigyCard (Demo Test, 6U Football)" → variant/player/team
+// Must match checkout.ts CLUB_SLUG — club sites share one Stripe sandbox
+// account, so without this filter every club's wall would show every other
+// club's sales. Sessions from before this tag existed (or from unrelated
+// manual Stripe testing) carry no club metadata and are excluded.
+const CLUB_SLUG = "colts";
+
+// Match on keywords, not a fragile prefix — survives label wording changes
+// (checkout.ts LABELS is the source of truth for what ships in the name).
+// "Physical Trading Card (Demo Colt, 6U Football)" → variant/player/team
 function parseItem(desc: string): { variant: string | null; playerName: string; teamLabel: string } {
-  const variant = desc.startsWith("Metal") ? "metal" : desc.startsWith("Digital") ? "digital" : null;
+  const d = desc.toLowerCase();
+  const variant = d.includes("postcard")
+    ? "postcard"
+    : d.includes("digital")
+      ? "digital"
+      : d.includes("metal") || d.includes("physical") || d.includes("trading card")
+        ? "metal"
+        : null;
   const m = desc.match(/\(([^)]*)\)\s*$/);
   let playerName = "";
   let teamLabel = "";
@@ -65,6 +80,7 @@ export default async function handler(req: any, res: any) {
   const byPlayer = new Map<string, { name: string; teamLabel: string; sold: number; raised: number }>();
 
   sessions.data.forEach((s: any, idx: number) => {
+    if (s?.metadata?.club !== CLUB_SLUG) return;
     const items = lineItemLists[idx]?.data;
     if (!Array.isArray(items)) return;
     let sessionHadCard = false;
@@ -73,7 +89,7 @@ export default async function handler(req: any, res: any) {
       const { variant, playerName, teamLabel } = parseItem(desc);
       if (!variant) continue;
       // internal test orders never reach the public wall
-      if (/^(demo|test|sample|mint)\b/i.test(playerName)) continue;
+      if (/^(demo|test|sample|mint|verify)\b/i.test(playerName)) continue;
       const qty = Number.isInteger(li.quantity) ? li.quantity : 1;
       sessionHadCard = true;
       count += qty;
