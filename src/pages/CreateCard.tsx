@@ -18,8 +18,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { teams, type Team, type TeamPlayer } from "@/lib/teams";
 import { teamConfig } from "@/lib/data";
-import CardFrame, { CardBackFrame, DEFAULT_PHOTO_TRANSFORM, type PhotoTransform } from "@/components/CardFrame";
-import { CARD_PRICES, useCart, type CardVariant } from "@/lib/cart";
+import PrintCardFront, { DEFAULT_PHOTO_TRANSFORM, type PhotoTransform } from "@/components/print/PrintCardFront";
+import PrintCardBack from "@/components/print/PrintCardBack";
+import { getTemplate } from "@/lib/cardTemplates";
+import { synthCardPlayer } from "@/lib/cardPlayer";
+import { CARD_PRICES, CLUB_SHARE, useCart, type CardVariant } from "@/lib/cart";
 import { saveRegistration } from "@/lib/registrations";
 
 const BLURB_MAX = 280;
@@ -65,6 +68,17 @@ export default function CreateCard() {
 
   const team = useMemo(() => teams.find((t) => t.id === teamId) ?? teams[0], [teamId]);
   const positions = team.gender === "Cheer" ? CHEER_POSITIONS : FOOTBALL_POSITIONS;
+
+  // The real ProdigyChain card chassis (same one used everywhere else on the
+  // platform) instead of a club-only lookalike frame. Fixed to the
+  // "prodigychain" template — the 5 canonical templates are shared platform-
+  // wide and aren't per-club recolorable (David's rule: no 6th template
+  // without real new frame artwork).
+  const cardTemplate = useMemo(() => getTemplate("prodigychain"), []);
+  const cardPlayer = useMemo(
+    () => synthCardPlayer({ name: playerName, position, team: `${team.ageGroup} ${team.gender} · ${teamConfig.name}` }),
+    [playerName, position, team],
+  );
 
   const onPickFile = (file: File | undefined) => {
     if (!file) return;
@@ -114,7 +128,7 @@ export default function CreateCard() {
     };
     addItem(player, team as Team, variant);
     setDone(true);
-    toast({ title: "Card added to cart", description: `${reg.playerName} — ${team.ageGroup} ${team.gender}` });
+    toast({ title: "Card added to cart", description: `${reg.playerName}, ${team.ageGroup} ${team.gender}` });
   };
 
   const reset = () => {
@@ -163,32 +177,30 @@ export default function CreateCard() {
             <div className="perspective-1000">
               <div className="relative aspect-[2.5/3.5] overflow-hidden rounded-xl card-glow" style={{ containerType: "inline-size" }}>
                 {side === "front" ? (
-                  /* The framed card — the frame is the product (ProdigyChain
-                     template in Colts colors; photo sits in the octagon window,
-                     position silhouette until one is uploaded). */
-                  <CardFrame
-                    photo={photo || null}
-                    name={playerName}
-                    number={jerseyNumber}
-                    position={position}
+                  /* The real ProdigyChain card chassis — the frame is the same
+                     art used everywhere else on the platform, not a lookalike.
+                     Photo drag-to-pan/zoom is unchanged; it just writes into
+                     the chassis's own percent-based transform now. */
+                  <PrintCardFront
+                    player={cardPlayer}
+                    template={cardTemplate}
+                    photoUrl={photo || null}
+                    jerseyNumber={jerseyNumber}
                     program={team.gender}
-                    teamLine={`${team.ageGroup} ${team.gender} · ${teamConfig.name}`}
-                    seasonLine={teamConfig.season}
-                    logo={coltsLogo}
+                    clubLogoUrl={coltsLogo}
                     className="absolute inset-0"
                     photoTransform={photoTransform}
                     onPhotoTransformChange={setPhotoTransform}
                   />
                 ) : (
-                  /* Back in the SAME template as the front (matching header,
-                     chevrons, octagon, footer) — the story rides in the window. */
-                  <CardBackFrame
-                    name={playerName}
-                    number={jerseyNumber}
+                  /* Back in the same chassis — the family's story fills the
+                     space a stats table would occupy on a ranked player's card. */
+                  <PrintCardBack
+                    player={cardPlayer}
+                    template={cardTemplate}
                     blurb={blurb}
-                    teamLine={`${team.ageGroup} ${team.gender} · ${teamConfig.name}`}
-                    seasonLine={teamConfig.season}
-                    logo={coltsLogo}
+                    jerseyNumber={jerseyNumber}
+                    clubLogoUrl={coltsLogo}
                     className="absolute inset-0"
                   />
                 )}
@@ -300,8 +312,8 @@ export default function CreateCard() {
               <h2 className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
                 <ShoppingCart className="h-4 w-4 text-accent" /> 5 · Order
               </h2>
-              <div className="mt-3 grid gap-3 sm:grid-cols-2">
-                {(["metal", "digital"] as CardVariant[]).map((v) => (
+              <div className="mt-3 grid gap-3 sm:grid-cols-3">
+                {(["digital", "metal", "postcard"] as CardVariant[]).map((v) => (
                   <button
                     key={v}
                     onClick={() => setVariant(v)}
@@ -309,16 +321,24 @@ export default function CreateCard() {
                       variant === v ? "border-primary bg-primary/10" : "border-border hover:border-muted-foreground"
                     }`}
                   >
-                    <p className="font-semibold">{v === "metal" ? "Metal Card" : "Digital Card"}</p>
+                    <p className="font-semibold">
+                      {v === "metal" ? "Trading Card" : v === "postcard" ? "Postcard" : "Digital Card"}
+                    </p>
                     <p className="text-2xl font-bold text-primary">${CARD_PRICES[v]}</p>
                     <p className="mt-1 text-xs text-muted-foreground">
                       {v === "metal"
-                        ? "Printed on metal, pickup at the club. $18 (60%) goes to the Colts."
-                        : "Shareable digital collectible. $11.25 (75%) goes to the Colts."}
+                        ? "2.5x3.5 metal card, pickup at the club."
+                        : v === "postcard"
+                          ? "5.5x8.5 metal postcard, pickup at the club."
+                          : "Shareable digital collectible."}
                     </p>
                   </button>
                 ))}
               </div>
+              <p className="mt-3 text-xs text-muted-foreground">
+                50% of every sale (${CLUB_SHARE[variant]} on this one) goes straight to the Colts. The
+                other 50% covers card creation, payment processing, and the platform fee.
+              </p>
               {done ? (
                 <div className="mt-4 space-y-2">
                   <p className="inline-flex items-center gap-1 text-sm font-medium text-emerald-400">

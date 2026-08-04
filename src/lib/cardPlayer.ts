@@ -1,0 +1,39 @@
+/**
+ * Minimal player-shaped record for the shared print-card chassis. This is a
+ * trimmed local stand-in for prodigy-rankings' full `Player` type (which
+ * carries 37 ranking-algorithm factor fields this club site has no use for) —
+ * PrintCardFront/PrintCardBack only ever read the fields below.
+ */
+export interface CardPlayer {
+  player_id: number;
+  player_name: string;
+  position: string;
+  current_team?: string;
+  overall_rank?: number;
+  country_rank?: number;
+  nationality_name?: string;
+  birth_year?: number;
+  height_cm?: number;
+  weight_kg?: number;
+}
+
+/**
+ * Build a render-ready CardPlayer for a family-registered (off-database)
+ * athlete — mirrors prodigy-rankings' synthPlayer() for the studio/custom-card
+ * chassis. player_id stays 0: that's the off-DB sentinel the chassis checks
+ * before doing any EP-lookup or QR-to-profile rendering, so it's the reason
+ * ranks/QR/flags all correctly stay hidden for a club card with no ranking
+ * profile behind it.
+ */
+export function synthCardPlayer(p: {
+  name: string;
+  position: string;
+  team?: string;
+}): CardPlayer {
+  return {
+    player_id: 0,
+    player_name: p.name || "Player Name",
+    position: p.position || "",
+    current_team: p.team || "",
+  };
+}

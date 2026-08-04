@@ -15,11 +15,16 @@ import {
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { playerCards, teamConfig } from "@/lib/data";
-import CardFrame, { CardBackFrame, DEFAULT_PHOTO_TRANSFORM } from "@/components/CardFrame";
+import PrintCardFront, { DEFAULT_PHOTO_TRANSFORM } from "@/components/print/PrintCardFront";
+import PrintCardBack from "@/components/print/PrintCardBack";
+import { getTemplate } from "@/lib/cardTemplates";
+import { synthCardPlayer } from "@/lib/cardPlayer";
 import { findFeaturedCard } from "@/lib/featured";
 import { listRegistrations } from "@/lib/registrations";
 import { statsForPlayer, useMintFeed } from "@/lib/mints";
 import coltsLogo from "@/assets/westchase-colts-logo.png";
+
+const cardTemplate = getTemplate("prodigychain");
 
 const CardPreview = () => {
   const { cardId } = useParams<{ cardId: string }>();
@@ -278,27 +283,23 @@ const CardPreview = () => {
                 style={{ containerType: "inline-size" }}
               >
                 {frameCard ? (
-                  <CardFrame
-                    photo={frameCard.photo}
+                  <PrintCardFront
+                    player={synthCardPlayer({ name: frameCard.playerName, position: frameCard.position, team: `${frameCard.division} ${frameCard.program} · ${teamConfig.name}` })}
+                    template={cardTemplate}
+                    photoUrl={frameCard.photo}
                     photoTransform={frameCard.photoTransform}
-                    name={frameCard.playerName}
-                    number={frameCard.jerseyNumber}
-                    position={frameCard.position}
+                    jerseyNumber={frameCard.jerseyNumber}
                     program={frameCard.program}
-                    teamLine={`${frameCard.division} ${frameCard.program} · ${teamConfig.name}`}
-                    seasonLine={teamConfig.season}
-                    logo={coltsLogo}
+                    clubLogoUrl={coltsLogo}
                     className="absolute inset-0"
                   />
                 ) : (
-                  <CardFrame
-                    photo={player!.front}
-                    name={player!.name}
-                    number={player!.number}
-                    position={player!.position}
-                    teamLine={`${player!.grade ?? teamConfig.season} · ${teamConfig.name}`}
-                    seasonLine={teamConfig.season}
-                    logo={coltsLogo}
+                  <PrintCardFront
+                    player={synthCardPlayer({ name: player!.name, position: player!.position, team: `${player!.grade ?? teamConfig.season} · ${teamConfig.name}` })}
+                    template={cardTemplate}
+                    photoUrl={player!.front}
+                    jerseyNumber={player!.number}
+                    clubLogoUrl={coltsLogo}
                     className="absolute inset-0"
                   />
                 )}
@@ -321,13 +322,12 @@ const CardPreview = () => {
                 style={{ transform: "rotateY(180deg)", containerType: "inline-size" }}
               >
                 {frameCard ? (
-                  <CardBackFrame
-                    name={frameCard.playerName}
-                    number={frameCard.jerseyNumber}
+                  <PrintCardBack
+                    player={synthCardPlayer({ name: frameCard.playerName, position: frameCard.position, team: `${frameCard.division} ${frameCard.program} · ${teamConfig.name}` })}
+                    template={cardTemplate}
                     blurb={frameCard.blurb}
-                    teamLine={`${frameCard.division} ${frameCard.program} · ${teamConfig.name}`}
-                    seasonLine={teamConfig.season}
-                    logo={coltsLogo}
+                    jerseyNumber={frameCard.jerseyNumber}
+                    clubLogoUrl={coltsLogo}
                     className="absolute inset-0"
                   />
                 ) : (
