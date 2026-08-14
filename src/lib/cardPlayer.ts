@@ -25,6 +25,18 @@ export interface CardPlayer {
  * ranks/QR/flags all correctly stay hidden for a club card with no ranking
  * profile behind it.
  */
+/**
+ * The chassis header badge was designed for 1-2 letter hockey positions
+ * (C, LW, G); full football/cheer position names overrun the frame's wordmark.
+ * Same abbreviation table the retired club CardFrame used.
+ */
+const POSITION_ABBREV: Record<string, string> = {
+  Quarterback: "QB", "Running Back": "RB", "Wide Receiver": "WR", "Tight End": "TE",
+  "Offensive Line": "OL", "Defensive Line": "DL", Linebacker: "LB", Cornerback: "CB",
+  Safety: "S", Kicker: "K", Athlete: "ATH",
+  Flyer: "FLY", Base: "BASE", Backspot: "BS", Tumbler: "TUM", Dancer: "DAN",
+};
+
 export function synthCardPlayer(p: {
   name: string;
   position: string;
@@ -33,7 +45,7 @@ export function synthCardPlayer(p: {
   return {
     player_id: 0,
     player_name: p.name || "Player Name",
-    position: p.position || "",
+    position: POSITION_ABBREV[p.position] ?? p.position ?? "",
     current_team: p.team || "",
   };
 }

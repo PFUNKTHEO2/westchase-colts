@@ -4,7 +4,7 @@
  * Family-created cards join it in the gallery; this one anchors the shelf.
  */
 import coltsTenULine from "@/assets/colts-10u-line.jpg";
-import type { PhotoTransform } from "@/components/CardFrame";
+import type { PhotoTransform } from "@/components/print/PrintCardFront";
 
 export interface FeaturedCard {
   id: string;

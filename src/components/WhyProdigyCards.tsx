@@ -10,7 +10,7 @@ const reasons = [
   {
     icon: Eye,
     title: "Transparent Fundraising",
-    description: "Every dollar is tracked. See exactly where funds go — no black boxes.",
+    description: "Every dollar is tracked. See exactly where funds go, no black boxes.",
   },
   {
     icon: Heart,

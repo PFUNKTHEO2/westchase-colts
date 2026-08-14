@@ -30,10 +30,22 @@ export const teamConfig: TeamConfig = {
   mascot: "Colts",
   season: "Fall 2026",
   sport: "Football & Cheer",
-  tagline: "Pop Warner Football & Cheer — 200+ Colts Families Strong Since 2001",
-  fundraisingGoal: 50000,
+  tagline: "Pop Warner Football & Cheer, 200+ Colts Families Strong Since 2001",
+  fundraisingGoal: 20000,
   currentAmount: 0,
 };
+
+/** Derives the SportProgressTrack sport key from teamConfig.sport's free
+ * text (e.g. "Football & Cheer" -> "football") so cloned club templates
+ * stay sport-correct without extra config. */
+export function primarySport(sportLabel: string): "football" | "soccer" | "hockey" | "cheer" {
+  const s = sportLabel.toLowerCase();
+  if (s.includes("football")) return "football";
+  if (s.includes("soccer")) return "soccer";
+  if (s.includes("hockey")) return "hockey";
+  if (s.includes("cheer")) return "cheer";
+  return "football";
+}
 
 export const playerCards: PlayerCard[] = [
   {
@@ -88,13 +100,18 @@ export const sponsors = [
   { name: "Ed Radice Concessions", tier: "Bronze" },
 ];
 
-// `reached` is computed live from the mint feed — nothing is pre-checked
+// `reached` is computed live from the mint feed — nothing is pre-checked.
+// Amounts and messaging per David's pass (7/20): realistic for what selling
+// cards actually raises, and flexible on use of funds — clubs want to spend
+// their own way, not be boxed into "pads and helmets."
 export const milestones = [
-  { amount: 10000, label: "New game helmets and shoulder pads for every division" },
-  { amount: 20000, label: "Cheer mats, uniforms, and competition entry fees" },
-  { amount: 30000, label: "Field and lighting improvements at Ed Radice" },
-  { amount: 40000, label: "Scholarship fund so every kid can play" },
-  { amount: 50000, label: "Pop Warner Nationals travel fund" },
+  { amount: 500, label: "First dollars in the account. The season has fuel." },
+  { amount: 1000, label: "Covers the extras a normal budget never has room for." },
+  { amount: 2000, label: "Coaches and staff get what they need, no more out of pocket." },
+  { amount: 5000, label: "Real flexibility. The board decides where this goes." },
+  { amount: 10000, label: "A meaningful cushion for whatever the season brings." },
+  { amount: 15000, label: "Championship-run ready, travel and gear covered." },
+  { amount: 20000, label: "The whole program funded. Our call how we spend it." },
 ];
 
 export const titleSponsor = {

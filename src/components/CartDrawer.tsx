@@ -18,7 +18,7 @@ export function CartDrawer({ open, onClose }: CartDrawerProps) {
   /**
    * The cart lives in memory and dies on the Stripe redirect, so we stash a
    * snapshot in localStorage right before leaving. /checkout/success reads it
-   * back to render the actual card in the mint celebration. If the photo data
+   * back to render the actual card on the created-card celebration. If the photo data
    * URLs blow the storage quota, retry without photos rather than fail.
    */
   const snapshotForCelebration = () => {
@@ -137,8 +137,8 @@ export function CartDrawer({ open, onClose }: CartDrawerProps) {
                           <p className="text-xs font-medium mt-0.5" style={{ color: "hsl(var(--primary))" }}>{variant.label}</p>
                         </div>
 
-                        {/* Quantity controls - only for metal */}
-                        {item.variant === "metal" ? (
+                        {/* Quantity controls for anything but digital (1 per player) */}
+                        {item.variant !== "digital" ? (
                           <div className="flex items-center gap-1 shrink-0">
                             <button
                               onClick={() => updateQuantity(item.id, item.quantity - 1)}

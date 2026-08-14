@@ -1,8 +1,9 @@
 /**
- * /checkout/success — the MINT MOMENT. Stripe redirects here after payment.
- * Reads the pre-checkout snapshot from localStorage, celebrates with confetti
- * and the actual card, hands the family a one-tap share, and clears the cart.
- * This page is the ignition point of the viral loop: pride → share → next mint.
+ * /checkout/success — the card is CREATED. Stripe redirects here after
+ * payment. Reads the pre-checkout snapshot from localStorage, celebrates
+ * with confetti and the actual card, hands the family a one-tap share, and
+ * clears the cart. This page is the ignition point of the viral loop:
+ * pride → share → next card.
  */
 import { useEffect, useMemo, useState } from "react";
 import { Helmet } from "react-helmet-async";
@@ -15,7 +16,9 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { useCart } from "@/lib/cart";
 import { teamConfig } from "@/lib/data";
-import CardFrame, { DEFAULT_PHOTO_TRANSFORM } from "@/components/CardFrame";
+import PrintCardFront, { DEFAULT_PHOTO_TRANSFORM } from "@/components/print/PrintCardFront";
+import { getTemplate } from "@/lib/cardTemplates";
+import { synthCardPlayer } from "@/lib/cardPlayer";
 import coltsLogo from "@/assets/westchase-colts-logo.png";
 
 interface MintItem {
@@ -26,7 +29,7 @@ interface MintItem {
   ageGroup: string;
   photo?: string;
   photoTransform?: { x: number; y: number; scale: number };
-  variant: "digital" | "metal";
+  variant: "digital" | "metal" | "postcard";
   quantity: number;
 }
 
@@ -110,8 +113,8 @@ export default function CheckoutSuccess() {
 
   const shareUrl = "https://colts.prodigychain.ai";
   const caption = star
-    ? `I just supported the ${teamConfig.name} by minting ${firstName}'s ProdigyCard! Every card puts money straight into the club. Mint yours: ${shareUrl}`
-    : `I just supported the ${teamConfig.name} by minting a ProdigyCard! Every card puts money straight into the club. Mint yours: ${shareUrl}`;
+    ? `I just supported the ${teamConfig.name} by creating ${firstName}'s ProdigyCard! Every card puts money straight into the club. Create yours: ${shareUrl}`
+    : `I just supported the ${teamConfig.name} by creating a ProdigyCard! Every card puts money straight into the club. Create yours: ${shareUrl}`;
 
   const canNativeShare = typeof navigator !== "undefined" && !!navigator.share;
 
@@ -148,7 +151,7 @@ export default function CheckoutSuccess() {
   return (
     <div className="min-h-screen flex flex-col">
       <Helmet>
-        <title>Minted! | {teamConfig.name}</title>
+        <title>Created! | {teamConfig.name}</title>
       </Helmet>
       <Confetti />
       <Navbar />
@@ -161,7 +164,7 @@ export default function CheckoutSuccess() {
           >
             <CheckCircle2 className="w-14 h-14 mx-auto text-primary mb-4" />
             <h1 className="font-display font-bold text-4xl text-foreground mb-2">
-              MINTED<span className="text-gradient-gold">!</span>
+              CREATED<span className="text-gradient-gold">!</span>
             </h1>
             <p className="text-lg text-foreground mb-1">
               {star ? (
@@ -175,7 +178,7 @@ export default function CheckoutSuccess() {
             </p>
             <p className="text-muted-foreground mb-6">
               {mintNumber
-                ? `Colts Mint #${mintNumber} of the Fall 2026 season. `
+                ? `Colts Card #${mintNumber} of the Fall 2026 season. `
                 : ""}
               A receipt is on its way to your email, and your purchase just put money in the club&apos;s pocket.
             </p>
@@ -194,16 +197,13 @@ export default function CheckoutSuccess() {
                 className="relative aspect-[2.5/3.5] overflow-hidden rounded-xl card-glow"
                 style={{ containerType: "inline-size" }}
               >
-                <CardFrame
-                  photo={star.photo || null}
-                  name={star.playerName}
-                  number={star.number}
-                  position={star.position}
+                <PrintCardFront
+                  player={synthCardPlayer({ name: star.playerName, position: star.position, team: `${star.ageGroup} ${star.program} · ${teamConfig.name}` })}
+                  template={getTemplate("prodigychain")}
+                  photoUrl={star.photo || null}
+                  jerseyNumber={star.number}
                   program={star.program}
-                  teamLine={`${star.ageGroup} ${star.program} · ${teamConfig.name}`}
-                  seasonLine="Fall 2026"
-                  serial="1/1"
-                  logo={coltsLogo}
+                  clubLogoUrl={coltsLogo}
                   className="absolute inset-0"
                   photoTransform={star.photoTransform ?? DEFAULT_PHOTO_TRANSFORM}
                 />
@@ -224,7 +224,7 @@ export default function CheckoutSuccess() {
               {canNativeShare && (
                 <Button size="lg" className="w-full gap-2" onClick={() => share("native")}>
                   <Share2 className="w-5 h-5" />
-                  Share {firstName ? `${firstName}'s` : "the"} mint
+                  Share {firstName ? `${firstName}'s` : "the"} card
                 </Button>
               )}
               <div className="flex gap-2 justify-center">
@@ -252,10 +252,10 @@ export default function CheckoutSuccess() {
 
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Button asChild size="lg">
-              <Link to="/create-card">Mint another Colt</Link>
+              <Link to="/create-card">Create another Colt</Link>
             </Button>
             <Button asChild variant="outline" size="lg">
-              <Link to="/">See the Mint Wall</Link>
+              <Link to="/">See the Card Wall</Link>
             </Button>
           </div>
         </div>

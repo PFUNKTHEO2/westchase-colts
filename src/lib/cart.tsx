@@ -1,7 +1,7 @@
 import { createContext, useContext, useState, ReactNode } from "react";
 import type { TeamPlayer, Team } from "@/lib/teams";
 
-export type CardVariant = "digital" | "metal";
+export type CardVariant = "digital" | "metal" | "postcard";
 
 export interface CartItem {
   id: string;
@@ -11,14 +11,24 @@ export interface CartItem {
   quantity: number;
 }
 
+// 50/50 split on every tier: half to the club, half covers card creation,
+// payment processing, and the platform fee (David's pricing pass, 7/20).
 export const CARD_PRICES: Record<CardVariant, number> = {
-  digital: 15,
-  metal: 30,
+  digital: 10,
+  metal: 20,
+  postcard: 38,
+};
+
+export const CLUB_SHARE: Record<CardVariant, number> = {
+  digital: 5,
+  metal: 10,
+  postcard: 19,
 };
 
 export const CARD_VARIANT_COLORS: Record<CardVariant, { name: string; border: string; bg: string; label: string }> = {
   digital: { name: "Digital", border: "border-primary", bg: "bg-primary/20", label: "Digital ProdigyCard" },
-  metal: { name: "Metal", border: "border-accent", bg: "bg-accent/20", label: "Metal Physical ProdigyCard" },
+  metal: { name: "Metal", border: "border-accent", bg: "bg-accent/20", label: "Physical Trading Card" },
+  postcard: { name: "Postcard", border: "border-yellow-400/60", bg: "bg-yellow-400/10", label: "ProdigyCard Postcard (5.5x8.5)" },
 };
 
 interface CartContextType {

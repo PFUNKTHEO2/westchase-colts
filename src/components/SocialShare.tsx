@@ -51,7 +51,7 @@ export function SocialShare() {
             Help us reach more supporters by sharing our fundraiser with your friends and family!
           </p>
           <p className="text-muted-foreground text-base mb-8 max-w-xl mx-auto">
-            There's something special about holding a player's card in your hands — setting it on the kitchen table, sticking it on the fridge, or trading it with a friend at the next game. Every physical card tells a story. Share ours, and help bring these athletes into homes beyond the field.
+            There's something special about holding a player's card in your hands, setting it on the kitchen table, sticking it on the fridge, or trading it with a friend at the next game. Every physical card tells a story. Share ours, and help bring these athletes into homes beyond the field.
           </p>
 
           <div className="flex flex-wrap items-center justify-center gap-4">

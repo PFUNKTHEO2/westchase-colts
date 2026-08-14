@@ -10,7 +10,9 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { TrendingUp, Share2, Rotate3d } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import CardFrame, { DEFAULT_PHOTO_TRANSFORM, type PhotoTransform } from "@/components/CardFrame";
+import PrintCardFront, { DEFAULT_PHOTO_TRANSFORM, type PhotoTransform } from "@/components/print/PrintCardFront";
+import { getTemplate } from "@/lib/cardTemplates";
+import { synthCardPlayer } from "@/lib/cardPlayer";
 import { listRegistrations } from "@/lib/registrations";
 import { featuredCards } from "@/lib/featured";
 import { statsForPlayer, useMintFeed } from "@/lib/mints";
@@ -34,6 +36,7 @@ export function CardGallery() {
     [],
   );
   const feed = useMintFeed();
+  const cardTemplate = useMemo(() => getTemplate("prodigychain"), []);
 
   return (
     <section className="py-14 bg-gradient-to-b from-background to-secondary/30 border-b border-border/50">
@@ -70,17 +73,15 @@ export function CardGallery() {
                     className="relative aspect-[2.5/3.5] overflow-hidden rounded-xl card-glow transition-transform group-hover:scale-[1.03]"
                     style={{ containerType: "inline-size" }}
                   >
-                    <CardFrame
-                      photo={card.photo}
-                      photoTransform={card.photoTransform ?? DEFAULT_PHOTO_TRANSFORM}
-                      name={card.playerName}
-                      number={card.jerseyNumber}
-                      position={card.position}
+                    <PrintCardFront
+                      player={synthCardPlayer({ name: card.playerName, position: card.position, team: `${teamLabel} · ${teamConfig.name}` })}
+                      template={cardTemplate}
+                      photoUrl={card.photo}
+                      jerseyNumber={card.jerseyNumber}
                       program={card.program}
-                      teamLine={`${teamLabel} · ${teamConfig.name}`}
-                      seasonLine={teamConfig.season}
-                      logo={coltsLogo}
+                      clubLogoUrl={coltsLogo}
                       className="absolute inset-0"
+                      photoTransform={card.photoTransform ?? DEFAULT_PHOTO_TRANSFORM}
                     />
                     <span className="absolute right-2 top-2 z-20 flex items-center gap-1 rounded-full bg-black/60 px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-white/90 backdrop-blur-sm">
                       <Rotate3d className="h-3 w-3" /> 3D

@@ -6,12 +6,11 @@ import { TitleSponsorSection } from "@/components/TitleSponsorSection";
 
 import { CardGallery } from "@/components/CardGallery";
 import { MintWall } from "@/components/MintWall";
-import { ProgramsSpotlight } from "@/components/ProgramsSpotlight";
 import { HowItWorks } from "@/components/HowItWorks";
 import { WhyProdigyCards } from "@/components/WhyProdigyCards";
+import { PricingSection } from "@/components/PricingSection";
 import { Milestones } from "@/components/Milestones";
 import { Leaderboard } from "@/components/Leaderboard";
-import { SponsorsSection } from "@/components/SponsorsSection";
 import { SocialShare } from "@/components/SocialShare";
 import { Footer } from "@/components/Footer";
 import { teamConfig } from "@/lib/data";
@@ -42,13 +41,11 @@ const Index = () => {
           <MintWall />
           <SponsorBanner />
           <TitleSponsorSection />
-          
-          <ProgramsSpotlight />
           <HowItWorks />
           <WhyProdigyCards />
+          <PricingSection />
           <Milestones />
           <Leaderboard />
-          <SponsorsSection />
           <SocialShare />
         </main>
         <Footer />

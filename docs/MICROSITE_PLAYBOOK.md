@@ -53,8 +53,13 @@ without asking them anything.
    - `src/lib/featured.ts` — the ONE curated featured card (real photo, real kid moment)
 3. **Swap assets:** logo, hero photo, per-sport position silhouettes
    (football/cheer/soccer wired; a new sport needs a silhouette set first).
-4. **Recolor:** the CardFrame `accent` prop + CSS brand variables recolor the
-   entire card system. This is deliberate: next club = color + logo swap.
+4. **Recolor (2026-08-09 update):** CSS brand variables recolor the SITE
+   (chrome, buttons, hero). The CARD does not recolor per club: every card
+   surface renders the canonical ProdigyCard chassis (`PrintCardFront` +
+   one of the 5 shared templates in `lib/cardTemplates.ts`; David's rule —
+   no 6th template without real frame artwork). Pick the closest of the 5
+   colorways for the club and set the club crest via `clubLogoUrl`. The old
+   per-club recolorable CardFrame is retired and deleted.
 5. **Copy pass:** sport-correct language everywhere. No football-isms on a
    soccer site. Non-profit line, programs, city.
 6. **Pricing:** server-side in `api/checkout.ts`. Defaults below (§5) until the
@@ -73,11 +78,17 @@ without asking them anything.
 
 ## 4. Hard-won build rules (violate these and the demo breaks)
 
-- **CardFrame container contract:** the frame sizes itself in `cqw` units.
-  Every usage needs the wrapper: `aspect-[2.5/3.5]` +
-  `style={{ containerType: "inline-size" }}` + CardFrame
-  `className="absolute inset-0"` + the club logo prop. Skip it and fonts blow
-  up and the photo window collapses.
+- **PrintCardFront container contract:** the chassis sizes itself in `cqw`
+  units. Every usage needs the wrapper: `aspect-[2.5/3.5]` +
+  `style={{ containerType: "inline-size" }}` + PrintCardFront
+  `className="absolute inset-0"`, plus `player={synthCardPlayer(...)}`,
+  `template={getTemplate("prodigychain")}` and `clubLogoUrl`. Skip the
+  wrapper and fonts blow up and the photo window collapses.
+- **Positions must stay short on the card.** The chassis header was built for
+  1-2 letter hockey positions; `synthCardPlayer` abbreviates long football and
+  cheer names (Offensive Line → OL). Route every card render through
+  `synthCardPlayer` — never hand-build a CardPlayer — or long positions smear
+  across the frame wordmark.
 - **The cart dies on the Stripe redirect** (in-memory). The Mint Moment reads a
   localStorage snapshot (`wc:last-mint`) saved right before redirect, with a
   photo-stripping fallback if the quota is hit.
