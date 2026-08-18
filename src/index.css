@@ -4,6 +4,90 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700;800&display=swap');
 
+/* Rift Font Family — the canonical card face used by PrintCardFront.
+   Must match prodigy-rankings/src/index.css so cards render identically
+   to the studio; without these the browser falls back to Impact and the
+   name/team lines collide with the photo. */
+@font-face {
+  font-family: 'Rift';
+  src: url('/fonts/Rift_Light.otf') format('opentype');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Rift';
+  src: url('/fonts/Rift_Light_Italic.otf') format('opentype');
+  font-weight: 300;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Rift';
+  src: url('/fonts/Rift_Regular.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Rift';
+  src: url('/fonts/Rift_Italic.otf') format('opentype');
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Rift';
+  src: url('/fonts/Rift_Medium.otf') format('opentype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Rift';
+  src: url('/fonts/Rift_Medium_Italic.otf') format('opentype');
+  font-weight: 500;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Rift';
+  src: url('/fonts/Rift_Demi.otf') format('opentype');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Rift';
+  src: url('/fonts/Rift_Demi_Italic.otf') format('opentype');
+  font-weight: 600;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Rift';
+  src: url('/fonts/Rift_Bold.otf') format('opentype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Rift';
+  src: url('/fonts/Rift_Bold_Italic.otf') format('opentype');
+  font-weight: 700;
+  font-style: italic;
+  font-display: swap;
+}
+
 @layer base {
   :root {
     /* Westchase Colts Dark Theme - Colts Navy & Royal Blue */
