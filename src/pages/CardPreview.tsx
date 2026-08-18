@@ -24,8 +24,6 @@ import { listRegistrations } from "@/lib/registrations";
 import { statsForPlayer, useMintFeed } from "@/lib/mints";
 import coltsLogo from "@/assets/westchase-colts-logo.png";
 
-const cardTemplate = getTemplate("prodigychain");
-
 const CardPreview = () => {
   const { cardId } = useParams<{ cardId: string }>();
   // legacy image-cards (curated graphics) still resolve; frame cards
@@ -48,8 +46,13 @@ const CardPreview = () => {
       blurb: r.blurb,
       photo: r.photo,
       photoTransform: r.photoTransform ?? DEFAULT_PHOTO_TRANSFORM,
+      templateId: r.templateId,
     };
   }, [cardId]);
+
+  // The template the family picked; getTemplate falls back to "prodigychain"
+  // for the curated featured card and any registration saved before templates.
+  const cardTemplate = getTemplate(frameCard?.templateId);
 
   const display = frameCard
     ? {

@@ -92,6 +92,18 @@ without asking them anything.
 - **The cart dies on the Stripe redirect** (in-memory). The Mint Moment reads a
   localStorage snapshot (`wc:last-mint`) saved right before redirect, with a
   photo-stripping fallback if the quota is hit.
+- **PhotoLayer (drag-to-pan + zoom) is now upstream too (2026-08-14).** This
+  project's `PrintCardFront.tsx` originated the interactive `onPhotoTransformChange`
+  pattern (drag to pan, +/− buttons, reset) because off-DB club cards needed
+  creator-side photo editing the ranked-player chassis didn't have yet. That
+  pattern is now merged into `prodigy-rankings/src/components/print/PrintCardFront.tsx`
+  as an opt-in prop — omit it and canonical renders exactly as before, pass it
+  and you get the same drag/zoom UI this project uses. `PhotoTransform` /
+  `DEFAULT_PHOTO_TRANSFORM` / zoom bounds (1×–3×, 0.2 step) are intentionally
+  identical between the two files — if you change the interaction here, port
+  it upstream too (and vice versa) so a future club clone doesn't start from
+  a stale copy. `printSpec.ts` geometry is already byte-identical between the
+  two repos; keep it that way.
 - **Stripe is the only database.** `/api/mints` reads completed checkout
   sessions: count, club cut, supporters, per-player sold/raised. Edge-cached
   60s; anything that must count THIS order (mint number) bypasses with

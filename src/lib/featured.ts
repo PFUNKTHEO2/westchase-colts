@@ -16,6 +16,8 @@ export interface FeaturedCard {
   blurb: string;
   photo: string;
   photoTransform: PhotoTransform;
+  /** one of the 5 canonical CARD_TEMPLATES ids; missing = "prodigychain" */
+  templateId?: string;
 }
 
 export const featuredCards: FeaturedCard[] = [

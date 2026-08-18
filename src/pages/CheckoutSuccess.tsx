@@ -29,6 +29,7 @@ interface MintItem {
   ageGroup: string;
   photo?: string;
   photoTransform?: { x: number; y: number; scale: number };
+  templateId?: string;
   variant: "digital" | "metal" | "postcard";
   quantity: number;
 }
@@ -199,7 +200,7 @@ export default function CheckoutSuccess() {
               >
                 <PrintCardFront
                   player={synthCardPlayer({ name: star.playerName, position: star.position, team: `${star.ageGroup} ${star.program} · ${teamConfig.name}` })}
-                  template={getTemplate("prodigychain")}
+                  template={getTemplate(star.templateId)}
                   photoUrl={star.photo || null}
                   jerseyNumber={star.number}
                   program={star.program}

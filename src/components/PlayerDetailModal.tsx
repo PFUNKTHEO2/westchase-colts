@@ -91,7 +91,7 @@ export function PlayerDetailModal({ player, team, onClose }: PlayerDetailModalPr
               <div className="relative aspect-[2.5/3.5] overflow-hidden rounded-xl" style={{ containerType: "inline-size" }}>
                 <PrintCardFront
                   player={synthCardPlayer({ name: player.name, position: player.position, team: `${team.ageGroup} ${team.gender} · ${teamConfig.name}` })}
-                  template={getTemplate("prodigychain")}
+                  template={getTemplate(player.templateId)}
                   photoUrl={player.photo || null}
                   jerseyNumber={player.number}
                   program={team.gender}

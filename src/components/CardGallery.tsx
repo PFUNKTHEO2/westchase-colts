@@ -28,6 +28,7 @@ interface GalleryCard {
   division: string;
   photo: string;
   photoTransform?: PhotoTransform;
+  templateId?: string;
 }
 
 export function CardGallery() {
@@ -36,7 +37,6 @@ export function CardGallery() {
     [],
   );
   const feed = useMintFeed();
-  const cardTemplate = useMemo(() => getTemplate("prodigychain"), []);
 
   return (
     <section className="py-14 bg-gradient-to-b from-background to-secondary/30 border-b border-border/50">
@@ -75,7 +75,7 @@ export function CardGallery() {
                   >
                     <PrintCardFront
                       player={synthCardPlayer({ name: card.playerName, position: card.position, team: `${teamLabel} · ${teamConfig.name}` })}
-                      template={cardTemplate}
+                      template={getTemplate(card.templateId)}
                       photoUrl={card.photo}
                       jerseyNumber={card.jerseyNumber}
                       program={card.program}

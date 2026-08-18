@@ -17,6 +17,8 @@ export interface TeamPlayer {
   blurb?: string;
   /** crop the family chose in the editor; lets the celebration card match */
   photoTransform?: { x: number; y: number; scale: number };
+  /** template the family picked in the creator; missing = "prodigychain" */
+  templateId?: string;
 }
 
 const footballPositions = [
@@ -120,6 +122,7 @@ export function teamsWithCards(): Team[] {
         photo: r.photo,
         blurb: r.blurb,
         photoTransform: r.photoTransform,
+        templateId: r.templateId,
       };
       const slot = players.findIndex((p) => p.number === r.jerseyNumber);
       if (slot >= 0) players[slot] = real;

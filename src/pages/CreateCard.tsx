@@ -20,7 +20,7 @@ import { teams, type Team, type TeamPlayer } from "@/lib/teams";
 import { teamConfig } from "@/lib/data";
 import PrintCardFront, { DEFAULT_PHOTO_TRANSFORM, type PhotoTransform } from "@/components/print/PrintCardFront";
 import PrintCardBack from "@/components/print/PrintCardBack";
-import { getTemplate } from "@/lib/cardTemplates";
+import { CARD_TEMPLATES, getTemplate } from "@/lib/cardTemplates";
 import { synthCardPlayer } from "@/lib/cardPlayer";
 import { CARD_PRICES, CLUB_SHARE, useCart, type CardVariant } from "@/lib/cart";
 import { saveRegistration } from "@/lib/registrations";
@@ -70,11 +70,12 @@ export default function CreateCard() {
   const positions = team.gender === "Cheer" ? CHEER_POSITIONS : FOOTBALL_POSITIONS;
 
   // The real ProdigyChain card chassis (same one used everywhere else on the
-  // platform) instead of a club-only lookalike frame. Fixed to the
-  // "prodigychain" template — the 5 canonical templates are shared platform-
-  // wide and aren't per-club recolorable (David's rule: no 6th template
-  // without real new frame artwork).
-  const cardTemplate = useMemo(() => getTemplate("prodigychain"), []);
+  // platform). Families pick one of the 5 canonical templates, the same picker
+  // the studio Card Generator offers; the set stays shared platform-wide and
+  // is not per-club recolorable (David's rule: no 6th template without real
+  // new frame artwork).
+  const [templateId, setTemplateId] = useState("prodigychain");
+  const cardTemplate = useMemo(() => getTemplate(templateId), [templateId]);
   const cardPlayer = useMemo(
     () => synthCardPlayer({ name: playerName, position, team: `${team.ageGroup} ${team.gender} · ${teamConfig.name}` }),
     [playerName, position, team],
@@ -115,6 +116,7 @@ export default function CreateCard() {
       blurb: blurb.trim(),
       photo,
       photoTransform,
+      templateId,
     });
     const player: TeamPlayer = {
       id: reg.id,
@@ -125,6 +127,7 @@ export default function CreateCard() {
       photo: reg.photo,
       blurb: reg.blurb,
       photoTransform: reg.photoTransform,
+      templateId: reg.templateId,
     };
     addItem(player, team as Team, variant);
     setDone(true);
@@ -134,7 +137,7 @@ export default function CreateCard() {
   const reset = () => {
     setPlayerName(""); setJerseyNumber(""); setPosition(""); setPhoto("");
     setPhotoTransform(DEFAULT_PHOTO_TRANSFORM);
-    setBlurb(""); setDone(false); setSide("front");
+    setBlurb(""); setDone(false); setSide("front"); setTemplateId("prodigychain");
   };
 
   return (
@@ -206,10 +209,27 @@ export default function CreateCard() {
                 )}
               </div>
             </div>
+            {/* Card color — the same 5 canonical templates the studio Card
+               Generator offers; each swatch is that template's background. */}
+            <div className="mt-3 flex items-center justify-center gap-2">
+              {CARD_TEMPLATES.map((t) => (
+                <button
+                  key={t.id}
+                  type="button"
+                  onClick={() => setTemplateId(t.id)}
+                  title={t.label}
+                  aria-label={`${t.label} template`}
+                  className={`h-8 w-8 rounded-full ring-2 transition ${
+                    templateId === t.id ? "ring-primary" : "ring-border hover:ring-muted-foreground"
+                  }`}
+                  style={{ background: t.background }}
+                />
+              ))}
+            </div>
             <p className="mt-3 text-center text-xs text-muted-foreground">
               {photo && side === "front"
                 ? "Drag the photo to position it. Pinch or use the + and − buttons to zoom."
-                : "Live preview. The printed card carries the same design."}
+                : "Live preview. Pick a card color above; the printed card carries the same design."}
             </p>
           </div>
 
