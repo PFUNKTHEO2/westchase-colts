@@ -30,6 +30,7 @@ interface MintItem {
   photo?: string;
   photoTransform?: { x: number; y: number; scale: number };
   templateId?: string;
+  nationality?: string;
   variant: "digital" | "metal" | "postcard";
   quantity: number;
 }
@@ -199,7 +200,7 @@ export default function CheckoutSuccess() {
                 style={{ containerType: "inline-size" }}
               >
                 <PrintCardFront
-                  player={synthCardPlayer({ name: star.playerName, position: star.position, team: `${star.ageGroup} ${star.program} · ${teamConfig.name}` })}
+                  player={synthCardPlayer({ name: star.playerName, position: star.position, team: `${star.ageGroup} ${star.program} · ${teamConfig.name}`, nationality: star.nationality })}
                   template={getTemplate(star.templateId)}
                   photoUrl={star.photo || null}
                   jerseyNumber={star.number}

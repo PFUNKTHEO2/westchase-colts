@@ -22,6 +22,7 @@ import { PRINT } from "@/lib/printSpec";
 import silhouetteFootball from "@/assets/silhouette-football.png";
 import silhouetteCheer from "@/assets/silhouette-cheer.png";
 import silhouetteSoccer from "@/assets/silhouette-soccer.png";
+import { getFlagNode } from "@/utils/countryFlags";
 
 export interface PhotoTransform {
   /** translate as a % of the photo element's own size (matches CSS % semantics). */
@@ -136,6 +137,10 @@ const PrintCardFront = ({
   const [photoError, setPhotoError] = useState(false);
   useEffect(() => setPhotoError(false), [photoUrl]);
 
+  // Defaults to USA for cards saved before nationality was collected (and the
+  // homepage team-level featured card, which has no individual player).
+  const flagNode = getFlagNode(player.nationality_name || "USA");
+
   return (
     <div
       className={`relative overflow-hidden ${className}`}
@@ -190,6 +195,18 @@ const PrintCardFront = ({
           </div>
         </div>
 
+        {/* Nationality flag, real per-player flag (ported 2026-08-21 from
+            prodigy-rankings getFlagNode/cardFlagClass via @/utils/countryFlags,
+            same package and framing as the ranked chassis). Families pick a
+            nation in the card creator, default USA. Bottom-right mirrors the
+            club crest bottom-left. */}
+        {flagNode && (
+          <div className="absolute bottom-[3.5%] right-[6%]" style={{ width: "11cqw", height: "11cqw" }}>
+            <div className="flex h-full w-full items-center justify-center overflow-hidden rounded-full bg-white">
+              {flagNode}
+            </div>
+          </div>
+        )}
         {clubLogoUrl && (
           <div className="absolute bottom-[3.5%] left-[6%]" style={{ width: "11cqw", height: "11cqw" }}>
             <div className="flex h-full w-full items-center justify-center overflow-hidden rounded-full bg-white">

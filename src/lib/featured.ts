@@ -16,6 +16,8 @@ export interface FeaturedCard {
   blurb: string;
   photo: string;
   photoTransform: PhotoTransform;
+  /** country name key into @/utils/countryFlags COUNTRY_ISO_CODES; missing = "USA" */
+  nationality?: string;
   /** one of the 5 canonical CARD_TEMPLATES ids; missing = "prodigychain" */
   templateId?: string;
 }

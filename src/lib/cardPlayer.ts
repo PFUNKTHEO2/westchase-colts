@@ -35,17 +35,27 @@ const POSITION_ABBREV: Record<string, string> = {
   "Offensive Line": "OL", "Defensive Line": "DL", Linebacker: "LB", Cornerback: "CB",
   Safety: "S", Kicker: "K", Athlete: "ATH",
   Flyer: "FLY", Base: "BASE", Backspot: "BS", Tumbler: "TUM", Dancer: "DAN",
+  // Soccer, added for the Hernando Premier FC clones (2026-08-20); kept in the
+  // template so every club inherits the same table.
+  Goalkeeper: "GK", "Center Back": "CB", Fullback: "FB", "Defensive Mid": "CDM",
+  "Central Mid": "CM", Winger: "W", Forward: "F", Striker: "ST",
+  "Head Coach": "HC",
 };
 
 export function synthCardPlayer(p: {
   name: string;
   position: string;
   team?: string;
+  /** country name key into @/utils/countryFlags COUNTRY_ISO_CODES; missing = "USA" */
+  nationality?: string;
 }): CardPlayer {
   return {
     player_id: 0,
     player_name: p.name || "Player Name",
     position: POSITION_ABBREV[p.position] ?? p.position ?? "",
     current_team: p.team || "",
+    // Family-picked in the card creator (2026-08-21), not looked up: there is
+    // no EP profile behind a club card to read it from.
+    nationality_name: p.nationality || "USA",
   };
 }

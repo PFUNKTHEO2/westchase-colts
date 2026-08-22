@@ -47,6 +47,7 @@ const CardPreview = () => {
       photo: r.photo,
       photoTransform: r.photoTransform ?? DEFAULT_PHOTO_TRANSFORM,
       templateId: r.templateId,
+      nationality: r.nationality,
     };
   }, [cardId]);
 
@@ -287,7 +288,7 @@ const CardPreview = () => {
               >
                 {frameCard ? (
                   <PrintCardFront
-                    player={synthCardPlayer({ name: frameCard.playerName, position: frameCard.position, team: `${frameCard.division} ${frameCard.program} · ${teamConfig.name}` })}
+                    player={synthCardPlayer({ name: frameCard.playerName, position: frameCard.position, team: `${frameCard.division} ${frameCard.program} · ${teamConfig.name}`, nationality: frameCard.nationality })}
                     template={cardTemplate}
                     photoUrl={frameCard.photo}
                     photoTransform={frameCard.photoTransform}
@@ -326,7 +327,7 @@ const CardPreview = () => {
               >
                 {frameCard ? (
                   <PrintCardBack
-                    player={synthCardPlayer({ name: frameCard.playerName, position: frameCard.position, team: `${frameCard.division} ${frameCard.program} · ${teamConfig.name}` })}
+                    player={synthCardPlayer({ name: frameCard.playerName, position: frameCard.position, team: `${frameCard.division} ${frameCard.program} · ${teamConfig.name}`, nationality: frameCard.nationality })}
                     template={cardTemplate}
                     blurb={frameCard.blurb}
                     jerseyNumber={frameCard.jerseyNumber}

@@ -15,6 +15,8 @@ export interface CardRegistration {
   division: string;
   program: "Football" | "Cheer";
   position: string;
+  /** country name key into @/utils/countryFlags COUNTRY_ISO_CODES; missing = "USA" */
+  nationality?: string;
   blurb: string;
   /** data-URL of the uploaded photo (demo); becomes a storage path in prod. */
   photo: string;

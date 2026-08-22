@@ -22,6 +22,7 @@ import PrintCardFront, { DEFAULT_PHOTO_TRANSFORM, type PhotoTransform } from "@/
 import PrintCardBack from "@/components/print/PrintCardBack";
 import { CARD_TEMPLATES, getTemplate } from "@/lib/cardTemplates";
 import { synthCardPlayer } from "@/lib/cardPlayer";
+import { NATIONALITY_OPTIONS } from "@/utils/countryFlags";
 import { CARD_PRICES, CLUB_SHARE, useCart, type CardVariant } from "@/lib/cart";
 import { saveRegistration } from "@/lib/registrations";
 
@@ -47,6 +48,7 @@ export default function CreateCard() {
   const [jerseyNumber, setJerseyNumber] = useState("");
   const [teamId, setTeamId] = useState(teams[0].id);
   const [position, setPosition] = useState("");
+  const [nationality, setNationality] = useState("USA");
 
   // photo
   const fileRef = useRef<HTMLInputElement>(null);
@@ -77,8 +79,8 @@ export default function CreateCard() {
   const [templateId, setTemplateId] = useState("prodigychain");
   const cardTemplate = useMemo(() => getTemplate(templateId), [templateId]);
   const cardPlayer = useMemo(
-    () => synthCardPlayer({ name: playerName, position, team: `${team.ageGroup} ${team.gender} · ${teamConfig.name}` }),
-    [playerName, position, team],
+    () => synthCardPlayer({ name: playerName, position, team: `${team.ageGroup} ${team.gender} · ${teamConfig.name}`, nationality }),
+    [playerName, position, team, nationality],
   );
 
   const onPickFile = (file: File | undefined) => {
@@ -113,6 +115,7 @@ export default function CreateCard() {
       division: team.ageGroup,
       program: team.gender,
       position,
+      nationality,
       blurb: blurb.trim(),
       photo,
       photoTransform,
@@ -128,6 +131,7 @@ export default function CreateCard() {
       blurb: reg.blurb,
       photoTransform: reg.photoTransform,
       templateId: reg.templateId,
+      nationality: reg.nationality,
     };
     addItem(player, team as Team, variant);
     setDone(true);
@@ -135,7 +139,7 @@ export default function CreateCard() {
   };
 
   const reset = () => {
-    setPlayerName(""); setJerseyNumber(""); setPosition(""); setPhoto("");
+    setPlayerName(""); setJerseyNumber(""); setPosition(""); setNationality("USA"); setPhoto("");
     setPhotoTransform(DEFAULT_PHOTO_TRANSFORM);
     setBlurb(""); setDone(false); setSide("front"); setTemplateId("prodigychain");
   };
@@ -260,6 +264,16 @@ export default function CreateCard() {
                   <option value="" disabled>Position</option>
                   {positions.map((p) => (
                     <option key={p} value={p}>{p}</option>
+                  ))}
+                </select>
+                <select
+                  value={nationality}
+                  onChange={(e) => setNationality(e.target.value)}
+                  className="h-10 rounded-md border border-input bg-background px-3 text-sm"
+                  aria-label="Nationality"
+                >
+                  {NATIONALITY_OPTIONS.map((n) => (
+                    <option key={n} value={n}>{n}</option>
                   ))}
                 </select>
               </div>

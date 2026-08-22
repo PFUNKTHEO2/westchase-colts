@@ -29,6 +29,7 @@ interface GalleryCard {
   photo: string;
   photoTransform?: PhotoTransform;
   templateId?: string;
+  nationality?: string;
 }
 
 export function CardGallery() {
@@ -74,7 +75,7 @@ export function CardGallery() {
                     style={{ containerType: "inline-size" }}
                   >
                     <PrintCardFront
-                      player={synthCardPlayer({ name: card.playerName, position: card.position, team: `${teamLabel} · ${teamConfig.name}` })}
+                      player={synthCardPlayer({ name: card.playerName, position: card.position, team: `${teamLabel} · ${teamConfig.name}`, nationality: card.nationality })}
                       template={getTemplate(card.templateId)}
                       photoUrl={card.photo}
                       jerseyNumber={card.jerseyNumber}

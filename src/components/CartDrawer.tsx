@@ -33,6 +33,7 @@ export function CartDrawer({ open, onClose }: CartDrawerProps) {
         photo: i.player.photo,
         photoTransform: i.player.photoTransform,
         templateId: i.player.templateId,
+        nationality: i.player.nationality,
         blurb: i.player.blurb,
         variant: i.variant,
         quantity: i.quantity,
