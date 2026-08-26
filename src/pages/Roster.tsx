@@ -9,6 +9,10 @@ import { Footer } from "@/components/Footer";
 import { PlayerDetailModal } from "@/components/PlayerDetailModal";
 import { teams, teamsWithCards, ageGroupList, type Team, type TeamPlayer } from "@/lib/teams";
 import { teamConfig } from "@/lib/data";
+import PrintCardFront from "@/components/print/PrintCardFront";
+import { getTemplate } from "@/lib/cardTemplates";
+import { synthCardPlayer } from "@/lib/cardPlayer";
+import coltsLogo from "@/assets/westchase-colts-logo.png";
 
 const Roster = () => {
   const [selectedAge, setSelectedAge] = useState<string>("all");
@@ -246,30 +250,38 @@ function TeamCard({
                 </div>
               </div>
 
-              {/* Player roster table */}
-              <div className="rounded-lg border border-border overflow-hidden">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="bg-muted/50">
-                      <th className="text-left px-4 py-2.5 font-medium text-muted-foreground w-12">#</th>
-                      <th className="text-left px-4 py-2.5 font-medium text-muted-foreground">Player</th>
-                      <th className="text-left px-4 py-2.5 font-medium text-muted-foreground hidden sm:table-cell">Position</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {team.players.map((player, i) => (
-                      <tr
-                        key={player.id}
-                        onClick={() => onPlayerClick(player)}
-                        className={`border-t border-border/50 cursor-pointer hover:bg-primary/10 transition-colors ${i % 2 === 0 ? "" : "bg-muted/20"}`}
-                      >
-                        <td className="px-4 py-2.5 font-mono text-muted-foreground">{player.number}</td>
-                        <td className="px-4 py-2.5 text-foreground">{player.name}</td>
-                        <td className="px-4 py-2.5 text-muted-foreground hidden sm:table-cell">{player.position}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+              {/* ProdigyCard grid: a real photo where one's on file, a
+                  position silhouette otherwise (PrintCardFront falls back
+                  to it when photoUrl is null). */}
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                {team.players.map((player) => (
+                  <button
+                    key={player.id}
+                    type="button"
+                    onClick={() => onPlayerClick(player)}
+                    className="group text-left"
+                  >
+                    <div
+                      className="relative aspect-[2.5/3.5] overflow-hidden rounded-xl card-glow transition-transform group-hover:scale-[1.03]"
+                      style={{ containerType: "inline-size" }}
+                    >
+                      <PrintCardFront
+                        player={synthCardPlayer({
+                          name: player.name,
+                          position: player.position,
+                          team: `${team.ageGroup} ${team.gender} · ${teamConfig.name}`,
+                          nationality: player.nationality,
+                        })}
+                        template={getTemplate(player.templateId)}
+                        photoUrl={player.photo || null}
+                        jerseyNumber={player.number}
+                        program={team.gender}
+                        clubLogoUrl={coltsLogo}
+                        className="absolute inset-0"
+                      />
+                    </div>
+                  </button>
+                ))}
               </div>
             </div>
           </motion.div>

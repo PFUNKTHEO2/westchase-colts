@@ -6,7 +6,7 @@
  */
 import { useMemo, useRef, useState } from "react";
 import { Helmet } from "react-helmet-async";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Camera, Check, PenLine, ShoppingCart, Sparkles, UserRound } from "lucide-react";
 import { Navbar } from "@/components/Navbar";
@@ -24,7 +24,7 @@ import { CARD_TEMPLATES, getTemplate } from "@/lib/cardTemplates";
 import { synthCardPlayer } from "@/lib/cardPlayer";
 import { NATIONALITY_OPTIONS } from "@/utils/countryFlags";
 import { CARD_PRICES, CLUB_SHARE, useCart, type CardVariant } from "@/lib/cart";
-import { saveRegistration } from "@/lib/registrations";
+import { listRegistrations, saveRegistration } from "@/lib/registrations";
 
 const BLURB_MAX = 280;
 const BLURB_PROMPTS = [
@@ -42,26 +42,59 @@ const CHEER_POSITIONS = ["Flyer", "Base", "Backspot", "Tumbler", "Dancer"];
 export default function CreateCard() {
   const { toast } = useToast();
   const { addItem } = useCart();
+  const [searchParams] = useSearchParams();
+
+  // Arriving from a roster popup ("Upload Your Own Photo & Story" /
+  // "Edit Card" in PlayerDetailModal) carries the clicked player's team,
+  // number, name and position in the URL so this save lands back on that
+  // exact roster slot instead of asking the parent to re-pick everything.
+  // Photo/blurb/template/parent contact aren't URL-safe (data-URL photos),
+  // so for an edit of an already-customized player we look up their most
+  // recent saved registration from the same localStorage teamsWithCards()
+  // reads, matched on team + jersey number, and prefill from that instead.
+  // Computed once from the URL this page loaded with, not tracked live.
+  const editIntent = useMemo(() => {
+    const teamParam = searchParams.get("team");
+    const playerParam = searchParams.get("player");
+    if (!teamParam || !playerParam) return null;
+    const matchedTeam = teams.find((t) => t.id === teamParam);
+    if (!matchedTeam) return null;
+    const numberParam = searchParams.get("number") ?? "";
+    const existing = numberParam
+      ? listRegistrations()
+          .filter((r) => r.division === matchedTeam.ageGroup && r.program === matchedTeam.gender && r.jerseyNumber === numberParam)
+          .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())[0]
+      : undefined;
+    return {
+      teamId: matchedTeam.id,
+      playerName: playerParam,
+      jerseyNumber: numberParam,
+      position: searchParams.get("position") ?? "",
+      nationality: searchParams.get("nationality") ?? "USA",
+      existing,
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // player
-  const [playerName, setPlayerName] = useState("");
-  const [jerseyNumber, setJerseyNumber] = useState("");
-  const [teamId, setTeamId] = useState(teams[0].id);
-  const [position, setPosition] = useState("");
-  const [nationality, setNationality] = useState("USA");
+  const [playerName, setPlayerName] = useState(editIntent?.existing?.playerName ?? editIntent?.playerName ?? "");
+  const [jerseyNumber, setJerseyNumber] = useState(editIntent?.existing?.jerseyNumber ?? editIntent?.jerseyNumber ?? "");
+  const [teamId, setTeamId] = useState(editIntent?.teamId ?? teams[0].id);
+  const [position, setPosition] = useState(editIntent?.existing?.position ?? editIntent?.position ?? "");
+  const [nationality, setNationality] = useState(editIntent?.existing?.nationality ?? editIntent?.nationality ?? "USA");
 
   // photo
   const fileRef = useRef<HTMLInputElement>(null);
-  const [photo, setPhoto] = useState("");
-  const [photoTransform, setPhotoTransform] = useState<PhotoTransform>(DEFAULT_PHOTO_TRANSFORM);
+  const [photo, setPhoto] = useState(editIntent?.existing?.photo ?? "");
+  const [photoTransform, setPhotoTransform] = useState<PhotoTransform>(editIntent?.existing?.photoTransform ?? DEFAULT_PHOTO_TRANSFORM);
   const [photoWarning, setPhotoWarning] = useState("");
 
   // story
-  const [blurb, setBlurb] = useState("");
+  const [blurb, setBlurb] = useState(editIntent?.existing?.blurb ?? "");
 
   // parent
-  const [parentName, setParentName] = useState("");
-  const [parentEmail, setParentEmail] = useState("");
+  const [parentName, setParentName] = useState(editIntent?.existing?.parentName ?? "");
+  const [parentEmail, setParentEmail] = useState(editIntent?.existing?.parentEmail ?? "");
 
   // order
   const [variant, setVariant] = useState<CardVariant>("metal");
@@ -76,7 +109,7 @@ export default function CreateCard() {
   // the studio Card Generator offers; the set stays shared platform-wide and
   // is not per-club recolorable (David's rule: no 6th template without real
   // new frame artwork).
-  const [templateId, setTemplateId] = useState("prodigychain");
+  const [templateId, setTemplateId] = useState(editIntent?.existing?.templateId ?? "prodigychain");
   const cardTemplate = useMemo(() => getTemplate(templateId), [templateId]);
   const cardPlayer = useMemo(
     () => synthCardPlayer({ name: playerName, position, team: `${team.ageGroup} ${team.gender} · ${teamConfig.name}`, nationality }),
