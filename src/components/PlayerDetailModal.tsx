@@ -1,6 +1,7 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, ShoppingCart, Star, Check, Plus, Minus } from "lucide-react";
+import { X, ShoppingCart, Star, Check, Plus, Minus, Camera, Pencil } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { TeamPlayer, Team } from "@/lib/teams";
 import { useCart, CARD_VARIANT_COLORS, CARD_PRICES, type CardVariant } from "@/lib/cart";
@@ -10,6 +11,7 @@ import { getTemplate } from "@/lib/cardTemplates";
 import { synthCardPlayer } from "@/lib/cardPlayer";
 import { teamConfig } from "@/lib/data";
 import { statsForPlayer, useMintFeed } from "@/lib/mints";
+import { listRegistrations } from "@/lib/registrations";
 import coltsLogo from "@/assets/westchase-colts-logo.png";
 
 interface PlayerDetailModalProps {
@@ -28,6 +30,26 @@ export function PlayerDetailModal({ player, team, onClose }: PlayerDetailModalPr
 
   // this card's live scoreboard: sold count + dollars back to the club
   const cardStats = statsForPlayer(feed, player.name, `${team.ageGroup} ${team.gender}`);
+
+  // a blurb only ever gets set by a family's own /create-card registration
+  // (generatePlayers never sets one), so its presence marks a card someone
+  // already customized versus the plain roster placeholder
+  const isCustomized = Boolean(player.blurb);
+  const editHref = `/create-card?${new URLSearchParams({
+    team: team.id,
+    player: player.name,
+    number: player.number,
+    position: player.position,
+    nationality: player.nationality || "USA",
+  }).toString()}`;
+
+  // saveRegistration() never overwrites, each edit is a new entry, so the
+  // same roster slot (team + jersey number) can carry a whole history; the
+  // newest one is what teamsWithCards() puts on the roster, but the older
+  // ones are still sitting in storage and worth surfacing rather than hiding
+  const cardVersions = listRegistrations()
+    .filter((r) => r.division === team.ageGroup && r.program === team.gender && r.jerseyNumber === player.number)
+    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
   const digitalInCart = items.some((i) => i.id === `${player.id}-digital`);
   const metalInCart = items.find((i) => i.id === `${player.id}-metal`);
@@ -133,6 +155,50 @@ export function PlayerDetailModal({ player, team, onClose }: PlayerDetailModalPr
                 &ldquo;{player.blurb}&rdquo;
               </p>
             )}
+
+            {cardVersions.length > 1 && (
+              <div className="rounded-lg border border-border/60 bg-muted/20 px-3 py-2">
+                <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+                  {cardVersions.length}&times; customized &middot; showing the newest version
+                </p>
+                <div className="flex gap-1.5 overflow-x-auto">
+                  {cardVersions.map((v, i) => (
+                    <div
+                      key={v.id}
+                      title={new Date(v.createdAt).toLocaleString("en-US")}
+                      className="relative aspect-[2.5/3.5] w-10 shrink-0 overflow-hidden rounded border"
+                      style={{ borderColor: i === 0 ? "hsl(var(--accent))" : "hsl(var(--border))" }}
+                    >
+                      <img src={v.photo} alt={`Card version from ${new Date(v.createdAt).toLocaleDateString("en-US")}`} className="h-full w-full object-cover" />
+                      {i === 0 && (
+                        <span className="absolute inset-x-0 bottom-0 bg-accent/90 text-center text-[7px] leading-tight text-accent-foreground">
+                          current
+                        </span>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Hands off to /create-card, pre-filled with this player's team,
+               number, position and name so the save merges back onto this
+               exact roster slot instead of creating a duplicate. */}
+            <Button asChild variant="outline" className="w-full gap-2">
+              <Link to={editHref}>
+                {isCustomized ? (
+                  <>
+                    <Pencil className="w-4 h-4" />
+                    Edit Card
+                  </>
+                ) : (
+                  <>
+                    <Camera className="w-4 h-4" />
+                    Upload Your Own Photo &amp; Story
+                  </>
+                )}
+              </Link>
+            </Button>
 
             {/* Purchase buttons side by side */}
             <div className="grid grid-cols-3 gap-2">
