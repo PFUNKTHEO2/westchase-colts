@@ -15,7 +15,7 @@
  * identical to what prints, no separate "editor" template to fall out of sync.
  */
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Minus, Plus, RotateCcw } from "lucide-react";
+import { Minus, Plus, RotateCcw, RotateCcwSquare, RotateCwSquare } from "lucide-react";
 import { CardTemplate } from "@/lib/cardTemplates";
 import { CardPlayer } from "@/lib/cardPlayer";
 import { PRINT } from "@/lib/printSpec";
@@ -30,16 +30,62 @@ export interface PhotoTransform {
   y: number;
   /** zoom; 1 = cover fit. */
   scale: number;
+  /** clockwise degrees, 0-359; turns a sideways phone photo upright. */
+  rotate: number;
 }
 
-export const DEFAULT_PHOTO_TRANSFORM: PhotoTransform = { x: 0, y: 0, scale: 1 };
+export const DEFAULT_PHOTO_TRANSFORM: PhotoTransform = { x: 0, y: 0, scale: 1, rotate: 0 };
+
+/** Aspect (w/h) of the photo element: it fills the trim box. */
+const PHOTO_BOX_ASPECT = PRINT.TRIM_W / PRINT.TRIM_H;
+
+/**
+ * Extra scale so a ROTATED photo still covers its box.
+ *
+ * object-cover only guarantees coverage at 0 degrees. Rotate the element and
+ * its axis-aligned footprint changes, so the corners show card background. For
+ * a w x h box turned by t the element spans w|cos t| + h|sin t| across and
+ * w|sin t| + h|cos t| down, so covering again needs the larger ratio.
+ *
+ * The box is 5:7, so a quarter turn needs 1.4x. Measured without this: 28.57%
+ * of the window renders as background at 90 degrees, which is exactly 2/7.
+ */
+export function photoCoverScale(rotateDeg: number, aspect = PHOTO_BOX_ASPECT): number {
+  const t = (((rotateDeg % 360) + 360) % 360) * (Math.PI / 180);
+  const c = Math.abs(Math.cos(t));
+  const s = Math.abs(Math.sin(t));
+  const w = aspect;
+  const h = 1;
+  return Math.max((w * c + h * s) / w, (w * s + h * c) / h);
+}
+
+/**
+ * CSS transform for the photo. Order matters: scale, then rotate, then
+ * translate, so panning stays screen-aligned instead of rotating with the
+ * image. With no rotation this emits exactly the string it always did, so
+ * every card made before rotation existed renders byte-identically.
+ */
+export function photoTransformCss(t: { x?: number; y?: number; scale?: number; rotate?: number }): string {
+  const x = t.x ?? 0;
+  const y = t.y ?? 0;
+  const scale = t.scale ?? 1;
+  const rotate = t.rotate ?? 0;
+  if (!rotate) return `translate(${x}%, ${y}%) scale(${scale})`;
+  return `translate(${x}%, ${y}%) rotate(${rotate}deg) scale(${scale * photoCoverScale(rotate)})`;
+}
 
 const MIN_ZOOM = 1;
 const MAX_ZOOM = 3;
 const ZOOM_STEP = 0.2;
 
 function clampTransform(t: PhotoTransform): PhotoTransform {
-  return { scale: Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, t.scale)), x: t.x, y: t.y };
+  return {
+    scale: Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, t.scale)),
+    x: t.x,
+    y: t.y,
+    // wraps rather than clamps: clamping would turn a -90 quarter turn into 0.
+    rotate: (((Math.round(t.rotate ?? 0) % 360) + 360) % 360),
+  };
 }
 
 export interface PrintCardFrontProps {
@@ -108,13 +154,15 @@ function PhotoLayer({
         alt=""
         draggable={false}
         className="pointer-events-none absolute inset-0 h-full w-full select-none object-cover object-top"
-        style={{ transform: `translate(${transform.x}%, ${transform.y}%) scale(${transform.scale})` }}
+        style={{ transform: photoTransformCss(transform) }}
       />
       {onChange && (
         <div className="absolute bottom-[4%] right-[4%] z-20 flex gap-1" onPointerDown={(e) => e.stopPropagation()}>
           {[
             { icon: Minus, act: () => apply({ ...transform, scale: transform.scale - ZOOM_STEP }), label: "Zoom out" },
             { icon: Plus, act: () => apply({ ...transform, scale: transform.scale + ZOOM_STEP }), label: "Zoom in" },
+            { icon: RotateCcwSquare, act: () => apply({ ...transform, rotate: (transform.rotate ?? 0) - 90 }), label: "Rotate left" },
+            { icon: RotateCwSquare, act: () => apply({ ...transform, rotate: (transform.rotate ?? 0) + 90 }), label: "Rotate right" },
             { icon: RotateCcw, act: () => onChange(DEFAULT_PHOTO_TRANSFORM), label: "Reset photo position" },
           ].map(({ icon: Icon, act, label }) => (
             <button

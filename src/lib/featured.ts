@@ -33,7 +33,7 @@ export const featuredCards: FeaturedCard[] = [
     blurb:
       "The 10U line gets set at Ed Radice. One team, one family, one goal. This is where Colts are made.",
     photo: coltsTenULine,
-    photoTransform: { x: 0, y: 0, scale: 1.1 },
+    photoTransform: { x: 0, y: 0, scale: 1.1 , rotate: 0 },
   },
 ];
 
