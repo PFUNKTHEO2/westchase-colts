@@ -17,6 +17,8 @@ export interface TeamPlayer {
   blurb?: string;
   /** crop the family chose in the editor; lets the celebration card match */
   photoTransform?: { x: number; y: number; scale: number };
+  /** photo treatment applied in the browser (background removed, shadow) */
+  treatment?: { removeBackground: boolean; shadow: boolean };
   /** template the family picked in the creator; missing = "prodigychain" */
   templateId?: string;
   /** country name key into @/utils/countryFlags COUNTRY_ISO_CODES; missing = "USA" */
@@ -124,6 +126,7 @@ export function teamsWithCards(): Team[] {
         photo: r.photo,
         blurb: r.blurb,
         photoTransform: r.photoTransform,
+        treatment: r.treatment,
         templateId: r.templateId,
         nationality: r.nationality,
       };

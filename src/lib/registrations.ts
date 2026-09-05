@@ -22,6 +22,8 @@ export interface CardRegistration {
   photo: string;
   /** crop/zoom the parent set in the frame (CardFrame PhotoTransform) */
   photoTransform?: { x: number; y: number; scale: number };
+  /** photo treatment applied in the browser before the photo was stored */
+  treatment?: { removeBackground: boolean; shadow: boolean };
   /** one of the 5 canonical CARD_TEMPLATES ids; missing = "prodigychain" */
   templateId?: string;
 }

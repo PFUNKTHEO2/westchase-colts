@@ -25,6 +25,8 @@ import { synthCardPlayer } from "@/lib/cardPlayer";
 import { NATIONALITY_OPTIONS } from "@/utils/countryFlags";
 import { CARD_PRICES, CLUB_SHARE, useCart, type CardVariant } from "@/lib/cart";
 import { listRegistrations, saveRegistration } from "@/lib/registrations";
+import PhotoTreatmentControls from "@/components/photo/PhotoTreatmentControls";
+import { usePhotoTreatment } from "@/lib/photoTreatment";
 
 const BLURB_MAX = 280;
 const BLURB_PROMPTS = [
@@ -88,6 +90,9 @@ export default function CreateCard() {
   const [photo, setPhoto] = useState(editIntent?.existing?.photo ?? "");
   const [photoTransform, setPhotoTransform] = useState<PhotoTransform>(editIntent?.existing?.photoTransform ?? DEFAULT_PHOTO_TRANSFORM);
   const [photoWarning, setPhotoWarning] = useState("");
+  // Remove background + Shadow (docs/PHOTO_TREATMENT.md). Runs on the parent's
+  // device; the treated image is baked, so the card just gets a transparent photo.
+  const treatment = usePhotoTreatment(photo || null, { rotateDeg: photoTransform.rotate ?? 0 });
 
   // story
   const [blurb, setBlurb] = useState(editIntent?.existing?.blurb ?? "");
@@ -136,10 +141,20 @@ export default function CreateCard() {
   };
 
   const emailOk = /.+@.+\..+/.test(parentEmail);
-  const ready = playerName.trim() && photo && blurb.trim().length >= 20 && parentName.trim() && emailOk && position;
+  const ready = playerName.trim() && photo && blurb.trim().length >= 20 && parentName.trim() && emailOk && position && !treatment.busy;
 
-  const order = () => {
+  const order = async () => {
     if (!ready) return;
+    // Registrations live in localStorage, so a treated photo is stored as a
+    // downscaled cutout (WebP with alpha where the browser encodes it, else
+    // PNG). Untreated photos keep today's behaviour.
+    let storedPhoto = photo;
+    try {
+      const treated = await treatment.exportWorking({ limits: { minShort: 0, maxLong: 1400 }, maxBytes: 1.6 * 1024 * 1024 });
+      if (treated) storedPhoto = treated.dataUrl;
+    } catch {
+      storedPhoto = treatment.working || photo;
+    }
     const reg = saveRegistration({
       parentName: parentName.trim(),
       parentEmail: parentEmail.trim(),
@@ -150,8 +165,9 @@ export default function CreateCard() {
       position,
       nationality,
       blurb: blurb.trim(),
-      photo,
+      photo: storedPhoto,
       photoTransform,
+      treatment: treatment.state.treatment,
       templateId,
     });
     const player: TeamPlayer = {
@@ -163,6 +179,7 @@ export default function CreateCard() {
       photo: reg.photo,
       blurb: reg.blurb,
       photoTransform: reg.photoTransform,
+      treatment: reg.treatment,
       templateId: reg.templateId,
       nationality: reg.nationality,
     };
@@ -224,7 +241,7 @@ export default function CreateCard() {
                   <PrintCardFront
                     player={cardPlayer}
                     template={cardTemplate}
-                    photoUrl={photo || null}
+                    photoUrl={treatment.working || photo || null}
                     jerseyNumber={jerseyNumber}
                     program={team.gender}
                     clubLogoUrl={coltsLogo}
@@ -332,6 +349,15 @@ export default function CreateCard() {
                 Game action, team photo day, or your favorite sideline shot. JPEG or PNG.
               </p>
               {photoWarning && <p className="mt-1 text-xs text-amber-400">{photoWarning}</p>}
+              {photo && (
+                <PhotoTreatmentControls
+                  className="mt-3"
+                  state={treatment.state}
+                  onRemoveBackground={treatment.setRemoveBackground}
+                  onShadow={treatment.setShadow}
+                  onUndo={treatment.undo}
+                />
+              )}
             </section>
 
             {/* 3 · story */}
