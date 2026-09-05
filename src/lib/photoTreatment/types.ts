@@ -32,10 +32,12 @@ export type TreatmentErrorCode = "UNSUPPORTED" | "MODEL_LOAD" | "INFER" | "TOO_L
 
 export class TreatmentError extends Error {
   code: TreatmentErrorCode;
+  cause?: unknown;
   constructor(code: TreatmentErrorCode, message: string, options?: { cause?: unknown }) {
-    super(message, options);
+    super(message);
     this.name = "TreatmentError";
     this.code = code;
+    if (options?.cause !== undefined) this.cause = options.cause;
   }
 }
 
