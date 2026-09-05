@@ -71,7 +71,7 @@ without asking them anything.
    GoDaddy add CNAME `<club>` → `cname.vercel-dns.com` plus the `_vercel` TXT
    verification record Vercel prints. GoDaddy DNS saves need an SMS code to
    Philippe's phone, so a human is in the loop for this step.
-9. **Verify (blocking, in a real browser):** create a card with a photo →
+9. **Verify (blocking, in a real browser):** create a card with a photo → toggle Remove background, then Shadow (first use downloads the model) → Undo restores the original →
    frame renders → cart → sandbox checkout with 4242 card → Mint Moment shows
    the card + mint number → wall updates. If any step fails, the demo is not
    ready and nothing gets sent.
@@ -104,6 +104,18 @@ without asking them anything.
   it upstream too (and vice versa) so a future club clone doesn't start from
   a stale copy. `printSpec.ts` geometry is already byte-identical between the
   two repos; keep it that way.
+- **Photo treatment (Remove background + Shadow) is a copied module (2026-09-05).**
+  `src/lib/photoTreatment/` and `src/components/photo/PhotoTreatmentControls.tsx`
+  are byte-identical copies of `prodigy-rankings` (same rule as `printSpec.ts`).
+  In-browser matting via `@huggingface/transformers` (`Xenova/modnet`, lazy-loaded
+  on first toggle); the shadow is baked into the exported image, so
+  `PrintCardFront`, the cart and `/api/*` never learn about it. `CreateCard.tsx`
+  stores a downscaled cutout (WebP with alpha, PNG on Safari) so registrations
+  stay under the localStorage quota, and `treatment` rides along into the cart
+  and the `wc:last-mint` snapshot. Re-apply with
+  `scratchpad/patch_club.py` (kept with the session notes) or by hand from the
+  Colts commit `64b7ddf`. Model files come from the Hugging Face CDN until the
+  shared bucket exists (`VITE_PHOTO_TREATMENT_MODEL_HOST`).
 - **Stripe is the only database.** `/api/mints` reads completed checkout
   sessions: count, club cut, supporters, per-player sold/raised. Edge-cached
   60s; anything that must count THIS order (mint number) bypasses with
