@@ -9,6 +9,7 @@ import Index from "./pages/Index";
 import Roster from "./pages/Roster";
 import CardPreview from "./pages/CardPreview";
 import CreateCard from "./pages/CreateCard";
+import ReturnFromCreator from "./pages/ReturnFromCreator";
 import CheckoutSuccess from "./pages/CheckoutSuccess";
 import SponsorPage from "./pages/SponsorPage";
 import NotFound from "./pages/NotFound";
@@ -27,6 +28,7 @@ const App = () => (
               <Route path="/" element={<Index />} />
               <Route path="/roster" element={<Roster />} />
               <Route path="/create-card" element={<CreateCard />} />
+              <Route path="/create/return" element={<ReturnFromCreator />} />
               <Route path="/checkout/success" element={<CheckoutSuccess />} />
               <Route path="/card-preview/:cardId" element={<CardPreview />} />
               <Route path="/sponsor/:sponsorSlug" element={<SponsorPage />} />
