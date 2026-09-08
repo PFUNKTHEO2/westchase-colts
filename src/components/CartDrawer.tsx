@@ -32,7 +32,6 @@ export function CartDrawer({ open, onClose }: CartDrawerProps) {
         ageGroup: i.team.ageGroup,
         photo: i.player.photo,
         photoTransform: i.player.photoTransform,
-        treatment: i.player.treatment,
         templateId: i.player.templateId,
         nationality: i.player.nationality,
         blurb: i.player.blurb,
