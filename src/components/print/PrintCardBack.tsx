@@ -7,9 +7,11 @@
  * (the family-authored story always wins). Same frame art, fonts, footer
  * badge layout as the canonical back.
  */
+import { useMemo } from "react";
 import { CardTemplate } from "@/lib/cardTemplates";
 import { CardPlayer } from "@/lib/cardPlayer";
 import { PRINT } from "@/lib/printSpec";
+import { fitBlurb, BLURB_MAX_SIZE_NO_STATS } from "./blurbFit";
 
 function accentFromGradient(gradient: string): string {
   const hexes = gradient.match(/#[0-9a-fA-F]{6}/g) ?? [];
@@ -54,6 +56,12 @@ const PrintCardBack = ({
   const edition = editionLabel ?? template.label;
   const hasArt = Boolean(template.backFrame);
   const story = blurb?.trim() || "Their story goes here. Written by the family, printed on the card, kept forever.";
+  // Auto-fit: a short story fills the box instead of floating in it, and the
+  // line limit shrinks as the type grows so it can never overflow (blurbFit.ts).
+  const storyType = useMemo(
+    () => fitBlurb(story, { baseSize: 3.4, maxLines: 12, maxSize: BLURB_MAX_SIZE_NO_STATS }),
+    [story],
+  );
 
   const footerCols = 4 + (clubLogoUrl ? 1 : 0);
   const footerColsClass = footerCols === 5 ? "grid-cols-5" : "grid-cols-4";
@@ -104,7 +112,7 @@ const PrintCardBack = ({
           <div className="mt-[2.2cqw] flex min-h-0 flex-1 items-center rounded-[1.6cqw] border px-[2.4cqw] py-[2cqw]" style={{ borderColor: `${accent}66` }}>
             <p
               className={`w-full overflow-hidden text-center italic leading-relaxed ${blurb?.trim() ? "text-white/90" : "text-white/40"}`}
-              style={{ fontSize: "3.4cqw", display: "-webkit-box", WebkitLineClamp: 12, WebkitBoxOrient: "vertical" }}
+              style={{ fontSize: storyType.fontSize, display: "-webkit-box", WebkitLineClamp: storyType.lineClamp, WebkitBoxOrient: "vertical" }}
             >
               {story}
             </p>
