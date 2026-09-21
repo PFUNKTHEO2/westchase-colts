@@ -237,7 +237,7 @@ const PrintCardFront = ({
             <img
               src={getSilhouette(program, player.position)}
               alt=""
-              className="h-[70%] w-auto object-contain mix-blend-multiply"
+              className="h-[70%] w-auto object-contain"
               style={{ transform: "translateY(-4%) scale(1.12)" }}
             />
           )}
