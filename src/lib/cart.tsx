@@ -1,7 +1,10 @@
 import { createContext, useContext, useState, ReactNode } from "react";
 import type { TeamPlayer, Team } from "@/lib/teams";
 
-export type CardVariant = "digital" | "metal" | "postcard";
+// "digital" removed (David 2026-09-21) -- it was still live and purchasable
+// on this template (PlayerDetailModal, ReturnFromCreator) even though every
+// other club site dropped it back on 2026-09-16.
+export type CardVariant = "metal" | "postcard";
 
 export interface CartItem {
   id: string;
@@ -14,19 +17,16 @@ export interface CartItem {
 // 50/50 split on every tier: half to the club, half covers card creation,
 // payment processing, and the platform fee (David's pricing pass, 7/20).
 export const CARD_PRICES: Record<CardVariant, number> = {
-  digital: 10,
   metal: 20,
   postcard: 38,
 };
 
 export const CLUB_SHARE: Record<CardVariant, number> = {
-  digital: 5,
   metal: 10,
   postcard: 19,
 };
 
 export const CARD_VARIANT_COLORS: Record<CardVariant, { name: string; border: string; bg: string; label: string }> = {
-  digital: { name: "Digital", border: "border-primary", bg: "bg-primary/20", label: "Digital ProdigyCard" },
   metal: { name: "Metal", border: "border-accent", bg: "bg-accent/20", label: "Physical Trading Card" },
   postcard: { name: "Postcard", border: "border-yellow-400/60", bg: "bg-yellow-400/10", label: "ProdigyCard Postcard (5.5x8.5)" },
 };
@@ -50,9 +50,6 @@ export function CartProvider({ children }: { children: ReactNode }) {
     const id = `${player.id}-${variant}`;
     const existing = items.find((i) => i.id === id);
     if (existing) {
-      // For digital, don't allow more than 1
-      if (variant === "digital") return;
-      // For metal, increase quantity
       setItems((prev) => prev.map((i) => i.id === id ? { ...i, quantity: i.quantity + quantity } : i));
       return;
     }

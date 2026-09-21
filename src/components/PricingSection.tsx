@@ -3,20 +3,16 @@
  * per-item cost breakdown. Reads straight from lib/cart so this section can
  * never drift from what checkout actually charges (David's pricing pass,
  * 7/20: replaces the old "Where Does the Money Go" section entirely).
+ * Digital tile removed (David 2026-09-21): it was still fully live and
+ * purchasable everywhere on this template, not just advertised here.
  */
 import { motion } from "framer-motion";
-import { Smartphone, CreditCard, Image as ImageIcon } from "lucide-react";
+import { CreditCard, Image as ImageIcon } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { CARD_PRICES } from "@/lib/cart";
 import { titleSponsor } from "@/lib/data";
 
 const TIERS = [
-  {
-    variant: "digital" as const,
-    icon: Smartphone,
-    title: "Digital ProdigyCard",
-    blurb: "Instant access. Share it on socials or keep it in your Gallery.",
-  },
   {
     variant: "metal" as const,
     icon: CreditCard,
@@ -52,7 +48,7 @@ export function PricingSection() {
                 </p>
               </div>
 
-              <div className="grid md:grid-cols-3 gap-6">
+              <div className="grid md:grid-cols-2 gap-6 max-w-xl mx-auto">
                 {TIERS.map((tier) => (
                   <div
                     key={tier.variant}

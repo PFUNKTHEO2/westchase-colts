@@ -161,8 +161,11 @@ export default function ReturnFromCreator() {
               <h2 className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
                 <ShoppingCart className="h-4 w-4 text-accent" /> Order
               </h2>
+              {/* Digital removed (David 2026-09-21): was still live here, same
+                  as PlayerDetailModal -- this template hadn't been kept in
+                  lockstep with the other club sites since 2026-09-16. */}
               <div className="mt-3 grid gap-3">
-                {(["digital", "metal", "postcard"] as CardVariant[]).map((v) => (
+                {(["metal", "postcard"] as CardVariant[]).map((v) => (
                   <button
                     key={v}
                     onClick={() => setVariant(v)}
@@ -170,10 +173,10 @@ export default function ReturnFromCreator() {
                       variant === v ? "border-primary bg-primary/10" : "border-border hover:border-muted-foreground"
                     }`}
                   >
-                    <p className="font-semibold">{v === "metal" ? "Trading Card" : v === "postcard" ? "Postcard" : "Digital Card"}</p>
+                    <p className="font-semibold">{v === "metal" ? "Trading Card" : "Postcard"}</p>
                     <p className="text-2xl font-bold text-primary">${CARD_PRICES[v]}</p>
                     <p className="mt-1 text-xs text-muted-foreground">
-                      {v === "metal" ? "2.5x3.5 metal card, pickup at the club." : v === "postcard" ? "5.5x8.5 metal postcard, pickup at the club." : "Shareable digital collectible."}
+                      {v === "metal" ? "2.5x3.5 metal card, pickup at the club." : "5.5x8.5 metal postcard, pickup at the club."}
                     </p>
                   </button>
                 ))}

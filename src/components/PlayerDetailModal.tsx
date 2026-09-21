@@ -51,18 +51,8 @@ export function PlayerDetailModal({ player, team, onClose }: PlayerDetailModalPr
     .filter((r) => r.division === team.ageGroup && r.program === team.gender && r.jerseyNumber === player.number)
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
-  const digitalInCart = items.some((i) => i.id === `${player.id}-digital`);
   const metalInCart = items.find((i) => i.id === `${player.id}-metal`);
   const postcardInCart = items.find((i) => i.id === `${player.id}-postcard`);
-
-  const handlePurchaseDigital = () => {
-    if (digitalInCart) {
-      toast({ title: "Already in cart", description: "Digital ProdigyCard is already in your cart." });
-      return;
-    }
-    addItem(player, team, "digital");
-    toast({ title: "Added to Cart!", description: `${player.name}, Digital ProdigyCard` });
-  };
 
   const handlePurchaseMetal = () => {
     addItem(player, team, "metal", metalQty);
@@ -200,32 +190,11 @@ export function PlayerDetailModal({ player, team, onClose }: PlayerDetailModalPr
               </Link>
             </Button>
 
-            {/* Purchase buttons side by side */}
-            <div className="grid grid-cols-3 gap-2">
-              {/* Digital column */}
-              <div className="space-y-2">
-                <Button
-                  onClick={handlePurchaseDigital}
-                  disabled={digitalInCart}
-                  size="lg"
-                  className="w-full gap-1.5 bg-primary text-primary-foreground hover:bg-primary/90 font-semibold text-xs h-auto py-3 px-1.5 disabled:opacity-60"
-                >
-                  {digitalInCart ? (
-                    <>
-                      <Check className="w-4 h-4 shrink-0" />
-                      <span>In Cart</span>
-                    </>
-                  ) : (
-                    <>
-                      <ShoppingCart className="w-4 h-4 shrink-0" />
-                      <span>Digital — ${CARD_PRICES.digital}</span>
-                    </>
-                  )}
-                </Button>
-                {/* Empty space to match the quantity-selector height on the other columns */}
-                <div className="h-9" />
-              </div>
-
+            {/* Purchase buttons side by side. Digital column removed
+                (David 2026-09-21): it was still fully live and purchasable
+                here even though every other club site dropped it back on
+                2026-09-16 -- this template hadn't been kept in lockstep. */}
+            <div className="grid grid-cols-2 gap-2">
               {/* Metal (trading card) column */}
               <div className="space-y-2">
                 <Button
@@ -286,7 +255,6 @@ export function PlayerDetailModal({ player, team, onClose }: PlayerDetailModalPr
             </div>
 
             <div className="space-y-2 text-xs text-muted-foreground">
-              <p><span className="font-semibold text-foreground">Digital ProdigyCard</span> can be shared on social media and kept in your Gallery.</p>
               <p><span className="font-semibold text-foreground">Physical Trading Card</span> printed on metal in standard 2.5x3.5 size, available for pickup at the Colts field house at Ed Radice.</p>
               <p><span className="font-semibold text-foreground">ProdigyCard Postcard</span> a bigger 5.5x8.5 metal print, great for a coach or grandparent.</p>
               <p>50% of every sale goes straight to the Colts. The other 50% covers card creation, payment processing, and the platform fee.</p>

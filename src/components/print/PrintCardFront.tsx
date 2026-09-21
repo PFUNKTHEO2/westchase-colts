@@ -19,7 +19,11 @@ import { Minus, Plus, RotateCcw, RotateCcwSquare, RotateCwSquare } from "lucide-
 import { CardTemplate } from "@/lib/cardTemplates";
 import { CardPlayer } from "@/lib/cardPlayer";
 import { PRINT } from "@/lib/printSpec";
-import silhouetteFootball from "@/assets/silhouette-football.png";
+import silhouetteFootballQB from "@/assets/silhouette-football-qb.jpg";
+import silhouetteFootballRB from "@/assets/silhouette-football-rb.jpg";
+import silhouetteFootballWR from "@/assets/silhouette-football-wr.jpg";
+import silhouetteFootballOL from "@/assets/silhouette-football-ol.jpg";
+import silhouetteFootballK from "@/assets/silhouette-football-k.jpg";
 import silhouetteCheer from "@/assets/silhouette-cheer.png";
 import silhouetteSoccer from "@/assets/silhouette-soccer.png";
 import { getFlagNode } from "@/utils/countryFlags";
@@ -105,8 +109,26 @@ export interface PrintCardFrontProps {
 
 const nameSize = (s: string) => (s.length > 22 ? "6cqw" : s.length > 17 ? "7.2cqw" : s.length > 12 ? "8.4cqw" : "10cqw");
 
-const getSilhouette = (program?: string) =>
-  program === "Cheer" ? silhouetteCheer : program === "Soccer" ? silhouetteSoccer : silhouetteFootball;
+/**
+ * Football positions -> the QB/RB/WR/OL/K silhouette set (David 2026-09-21).
+ * Only these 5 have dedicated art. Everything else -- Tight End, Defensive
+ * Line, Linebacker, Cornerback, Safety, Athlete, and any position the abbrev
+ * table doesn't recognise -- defaults to RB, same as David's own rule:
+ * "use RB for the ones we do not know the position."
+ */
+const FOOTBALL_SILHOUETTE_BY_POSITION: Record<string, string> = {
+  Quarterback: silhouetteFootballQB, QB: silhouetteFootballQB,
+  "Running Back": silhouetteFootballRB, RB: silhouetteFootballRB,
+  "Wide Receiver": silhouetteFootballWR, WR: silhouetteFootballWR,
+  "Offensive Line": silhouetteFootballOL, OL: silhouetteFootballOL,
+  Kicker: silhouetteFootballK, K: silhouetteFootballK,
+};
+
+const getSilhouette = (program?: string, position?: string) => {
+  if (program === "Cheer") return silhouetteCheer;
+  if (program === "Soccer") return silhouetteSoccer;
+  return FOOTBALL_SILHOUETTE_BY_POSITION[position ?? ""] ?? silhouetteFootballRB;
+};
 
 /** The photo layer: static render when onChange is omitted, drag-to-pan +
  *  buttons-to-zoom when provided. Percent-based transform, matches the print
@@ -213,7 +235,7 @@ const PrintCardFront = ({
             />
           ) : (
             <img
-              src={getSilhouette(program)}
+              src={getSilhouette(program, player.position)}
               alt=""
               className="h-[70%] w-auto object-contain mix-blend-multiply"
               style={{ transform: "translateY(-4%) scale(1.12)" }}

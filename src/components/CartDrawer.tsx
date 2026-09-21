@@ -139,26 +139,23 @@ export function CartDrawer({ open, onClose }: CartDrawerProps) {
                           <p className="text-xs font-medium mt-0.5" style={{ color: "hsl(var(--primary))" }}>{variant.label}</p>
                         </div>
 
-                        {/* Quantity controls for anything but digital (1 per player) */}
-                        {item.variant !== "digital" ? (
-                          <div className="flex items-center gap-1 shrink-0">
-                            <button
-                              onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                              className="w-7 h-7 rounded-full bg-muted/50 flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
-                            >
-                              <Minus className="w-3 h-3" />
-                            </button>
-                            <span className="w-6 text-center text-sm font-bold text-foreground">{item.quantity}</span>
-                            <button
-                              onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                              className="w-7 h-7 rounded-full bg-muted/50 flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
-                            >
-                              <Plus className="w-3 h-3" />
-                            </button>
-                          </div>
-                        ) : (
-                          <span className="text-xs text-muted-foreground shrink-0">×1</span>
-                        )}
+                        {/* Quantity controls -- both remaining products (metal, postcard)
+                            are quantity-adjustable now that digital (1-per-player) is gone. */}
+                        <div className="flex items-center gap-1 shrink-0">
+                          <button
+                            onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                            className="w-7 h-7 rounded-full bg-muted/50 flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
+                          >
+                            <Minus className="w-3 h-3" />
+                          </button>
+                          <span className="w-6 text-center text-sm font-bold text-foreground">{item.quantity}</span>
+                          <button
+                            onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                            className="w-7 h-7 rounded-full bg-muted/50 flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
+                          >
+                            <Plus className="w-3 h-3" />
+                          </button>
+                        </div>
 
                         <p className="text-sm font-bold text-foreground shrink-0">${lineTotal}</p>
                         <button

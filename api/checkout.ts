@@ -13,14 +13,17 @@
 const CLUB_SLUG = "colts";
 // 50/50 split, per David's pricing pass (7/20): half to the club, half
 // covers card creation, payment processing, and the platform fee.
+// "digital" removed (David 2026-09-21): it was still live and purchasable
+// on this template's own pages, and the server still priced and accepted
+// it too -- a raw POST here could still have bought one. Removing the key
+// makes the validation filter below reject it outright, same as any other
+// invalid variant.
 const PRICES_CENTS: Record<string, number> = {
-  digital: 1000,
   metal: 2000,
   postcard: 3800,
 };
 
 const LABELS: Record<string, string> = {
-  digital: "Digital ProdigyCard",
   metal: "Physical Trading Card",
   postcard: "ProdigyCard Postcard (5.5x8.5)",
 };
